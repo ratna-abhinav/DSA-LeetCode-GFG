@@ -1,0 +1,18 @@
+int missingK(vector < int > vec, int n, int k) {
+
+    int lo = 1, hi = 1e9+2;
+    while (lo <= hi)
+    {
+        int mid = (lo + hi) / 2;
+        // count no of elements smaller than <= mid
+
+        int cnt = upper_bound(vec.begin(), vec.end(), mid) - vec.begin();
+        // cnt no of elements are <= mid, so mid is actually (but not exactly) (mid - cnt)th missing number
+        // Ex -> {2, 3, 4, 7, 10, 11}, K = 3, so if ur mid is 7, then mid-cnt = 3, but 7 is not actually the
+        // 3rd missing +ve integer, but we are sure that answer <= 7
+        if (mid-cnt >= k) hi = mid-1;
+        else lo = mid+1;
+    }
+    
+    return hi+1;
+}
