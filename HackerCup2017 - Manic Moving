@@ -1,0 +1,102 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+int n, m, K;
+const int inf = 1e15;
+vector<vector<int>> dist;
+vector<pair<int, int>> family;
+
+// currently ith family ka pick karna hai and hum abhi j par hai
+// and in my truck i already have k families samaan
+int rec(int i, int j, int k)
+{
+	// base case
+	if (i == K)
+	{
+		if (k == 0) return 0;
+		if (k == 1) return dist[j][family[K-1].second];
+		if (k == 2)
+		{
+			int cost = dist[j][family[K - 2].second] + dist[family[K - 2].second][family[K - 1].second];
+			return cost;
+		}
+	}
+
+	int ans;
+	if (k == 0)
+	{
+		// pick up current family samaan
+		ans = rec(i + 1, family[i].first, 1) + dist[j][family[i].first];
+	}
+	else if (k == 1)
+	{
+		// pick up
+		int op1 = dist[j][family[i].first] + rec(i + 1, family[i].first, 2);
+
+		// deliver old
+		int deliver = dist[j][family[i - 1].second] + dist[family[i - 1].second][family[i].first];
+		int op2 = deliver + rec(i + 1, family[i].first, 1);
+		ans = min(op1, op2);
+	}
+	else
+	{
+		// deliver both samaan first
+		int cost = dist[j][family[i - 2].second] + dist[family[i - 2].second][family[i - 1].second] + dist[family[i - 1].second][family[i].first];
+		ans = cost + rec(i + 1, family[i].first, 1);
+	}
+	return ans;
+}
+
+void solve()
+{
+	cin >> n >> m >> K;
+	dist = vector<vector<int>>(n + 1, vector<int>(n + 1, inf));
+	for (int i = 0; i < m; i++)
+	{
+		int u, v, w;
+		cin >> u >> v >> w;
+		dist[u][v] = w;
+		dist[v][u] = w;
+	}
+
+	for (int i = 1; i <= n; i++)
+		dist[i][i] = 0;
+
+	for (int k = 1; k <= n; k++)
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				if (dist[i][k] < inf and dist[k][j] < inf)
+					dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+			}
+		}
+	}
+
+	family = vector<pair<int, int>>(K);
+	for (int i = 0; i < K; i++)
+		cin >> family[i].first >> family[i].second;
+	for (int i = 0; i < K; i++)
+	{
+		if (dist[1][family[i].first] >= inf or dist[1][family[i].second] >= inf)
+		{
+			cout << -1 << endl;
+			return;
+		}
+	}
+
+	cout << rec(0,1,0) << endl;
+}
+
+signed main()
+{
+	int t = 1;
+	cin >> t;
+	for (int i = 0; i < t; i++)
+		solve();
+
+	return 0;
+}
