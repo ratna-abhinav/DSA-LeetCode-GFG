@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+signed main()
+{
+	while (1)
+	{
+		int n, m;
+		cin >> n;
+		if (n == 0)
+			break;
+		cin >> m;
+		vector<pair<int, double>> g[n + 1];
+		for (int i = 0; i < m; i++)
+		{
+			int u, v, w;
+			cin >> u >> v >> w;
+			double c = -log2((1.0 * w / 100));
+			g[u].push_back({v, c});
+			g[v].push_back({u, c});
+		}
+
+		// o(n^2) dijkstra
+		vector<double> dist(n + 1, 1e9);
+		vector<int> vis(n + 1, 0);
+		dist[1] = 0;
+		for (int i = 0; i < n; i++)
+		{
+			int v = -1;
+			for (int j = 1; j <= n; j++)
+			{
+				if (!vis[j] and (v == -1 or dist[v] > dist[j]))
+					v = j;
+			}
+			if (v == -1 or dist[v] == 1e9)
+				break;
+			vis[v] = 1;
+			for (auto e : g[v])
+			{
+				int u = e.first;
+				double wt = e.second;
+				dist[u] = min(dist[u], dist[v] + wt);
+			}
+		}
+		double ans = 100 * pow(2, -dist[n]);
+		cout << fixed << setprecision(7) << ans << " percent\n";
+	}
+
+	return 0;
+}
