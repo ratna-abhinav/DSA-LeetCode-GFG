@@ -1,0 +1,88 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+const int inf = 1e15;
+int tc;
+
+void solve(int n)
+{
+	if (n==0) return;
+	tc++;
+
+	string s[n]; unordered_map<string, int> id;
+	vector<vector<int>> dist(n, vector<int> (n));
+	for (int i=0; i<n; i++)
+	{
+		cin >> s[i];
+		id[s[i]] = i;
+		for (int j=0; j<n; j++)
+		{
+			cin >> dist[i][j];
+		}
+	}
+	for (int i=0; i<n; i++)
+	{
+		for (int j=0; j<n; j++)
+		{
+			if (i!=j and dist[i][j]==0) dist[i][j] = inf;
+			
+			// stupid thing mentioned in Q, instead it should have been given as 0 in the input itself
+			if (i==j and dist[i][j] > 0) dist[i][j] = 0;
+		}
+	}
+
+	// we want all pair shortest paths
+	for (int k=0; k<n; k++)
+	{
+		for (int i=0; i<n; i++)
+		{
+			for (int j=0; j<n; j++)
+			{
+				if (dist[i][k] < inf and dist[k][j] < inf)
+					dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+			}
+		}
+	}
+	cout << "Case #" << tc <<  ":\n";
+
+	int q; cin >> q;
+	while (q--)
+	{
+		int u,v; cin >> u >> v;
+		if (dist[u][v] == inf) 
+		{
+			cout << s[u] << "-" << s[v] << ' ';
+			cout << "NOT REACHABLE\n";
+		}
+		else
+		{
+			bool negCycle = 0;
+			for (int x=0; x<n; x++)
+			{
+				if (dist[u][x] < inf and dist[x][x] < 0 and dist[x][v] < inf)
+				{
+					cout << "NEGATIVE CYCLE\n";
+					negCycle = 1;
+					break;
+				}
+			}
+			if (negCycle == 0) 
+			{
+				cout << s[u] << "-" << s[v] << ' ' << dist[u][v] << endl;
+			}
+		}
+	}
+}
+
+signed main()
+{
+	int n;
+	while (cin >> n) 
+	{
+		solve(n);
+	}
+
+	return 0;
+}
