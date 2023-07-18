@@ -1,0 +1,65 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int INF = 1e9;
+
+vector<int> get_path(int i, int j, vector<vector<int>> &dist, vector<vector<int>> &maxn)
+{
+	// base case
+	if (i == j or maxn[i][j] == 0) return {};
+
+	vector<int> left = get_path(i, maxn[i][j], dist, maxn);
+	vector<int> right = get_path(maxn[i][j], j, dist, maxn);
+	left.push_back(maxn[i][j]);
+	for (auto e : right) left.push_back(e);
+	return left;
+}
+
+signed main()
+{
+	int n, m;
+	cin >> n >> m;
+	vector<vector<int>> dist(n + 1, vector<int>(n + 1, INF));
+	vector<vector<int>> maxn(n + 1, vector<int>(n + 1, -1));
+	for (int i = 1; i <= n; i++) dist[i][i] = 0;
+
+	for (int i = 0; i < m; i++)
+	{
+		int u, v, w; cin >> u >> v >> w;
+		dist[u][v] = w;
+		maxn[u][v] = 0;
+	}
+
+	for (int k = 1; k <= n; k++)
+	{
+		for (int i = 1; i <= n; i++)
+		{
+			for (int j = 1; j <= n; j++)
+			{
+				if (dist[i][k] < INF and dist[k][j] < INF)  // it's possible to reach k from i and it's possible to reach j from k
+				{
+					if (dist[i][j] > dist[i][k] + dist[k][j])
+					{
+						dist[i][j] = dist[i][k] + dist[k][j];
+						maxn[i][j] = k;
+					}
+				}
+			}
+		}
+	}
+	// maxn[i][j] -> stores the last phase when dist[i][j] was updated
+
+	int u, v; cin >> u >> v;
+	if (dist[u][v] == INF) cout << "No Path\n";
+	else
+	{
+		vector<int> ret = get_path(u, v, dist, maxn);
+		vector<int> path; path.push_back(u);
+		for (auto e : ret) path.push_back(e);
+		path.push_back(v);
+		for (auto e : path) cout << e << ' ';
+		cout << endl;
+	}
+
+	return 0;
+}
