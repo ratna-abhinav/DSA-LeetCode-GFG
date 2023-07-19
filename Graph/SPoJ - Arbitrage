@@ -1,0 +1,61 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+const int inf = 1e18;
+int sc;
+
+void solve(int n)
+{
+	if (n == 0)
+		return;
+	sc++;
+	unordered_map<string, int> name;
+	string s[n];
+	for (int i = 0; i < n; i++)
+	{
+		cin >> s[i];
+		name[s[i]] = i;
+	}
+	vector<vector<double>> dist(n, vector<double>(n, 0.0));  // initialize it with correct values and it is 0.0 not 0 or inf
+
+	int m;
+	cin >> m;
+	for (int i = 0; i < m; i++)
+	{
+		string u, v;
+		double w;
+		cin >> u >> w >> v;
+		dist[name[u]][name[v]] = max(dist[name[u]][name[v]], w);
+	}
+
+	for (int k = 0; k < n; k++)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				dist[i][j] = max(dist[i][j], dist[i][k] * dist[k][j]);
+			}
+		}
+	}
+	for (int i = 0; i < n; i++)
+	{
+		if (dist[i][i] > 1)
+		{
+			cout << "Case " << sc << ": Yes\n";
+			return;
+		}
+	}
+	cout << "Case " << sc << ": No\n";
+}
+
+signed main()
+{
+	int n;
+	while (cin >> n)
+		solve(n);
+
+	return 0;
+}
