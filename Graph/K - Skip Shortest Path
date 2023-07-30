@@ -1,0 +1,52 @@
+int n, m;
+const int inf = 1e18;
+vvi dist, vis;
+
+// given source vertex as 1, find the SSSP such that u are allowed to skip K edges in the SP from 1 to any vertex. You can skip K edges
+// for SP of every vertex from 1
+void solve()
+{
+    int k;
+    cin >> n >> m >> k;
+    vpi g[n + 1];
+    rep(i, 0, m)
+    {
+        int u, v, w; cin >> u >> v >> w;
+        g[u].pb({v, w});
+        g[v].pb({u, w});
+    }
+
+    set<arr(3)> s;
+    dist = vvi(n + 1, vi(k + 1, inf));
+    vis = vvi(n + 1, vi(k + 1, 0));
+    s.insert({0, 1, 0});        // {d,cur,skips}
+
+    // dist[u][k] -> min distance req to reach u after k edge skips
+    while (not s.empty())
+    {
+        auto it = s.begin();
+        int cur = it->at(1), d = it->at(0), f = it->at(2);
+        s.erase(it);
+
+        if (vis[cur][f]) continue;
+        vis[cur][f] = 1;
+        dist[cur][f] = d;
+
+        for (auto nb : g[cur])
+        {
+            int node = nb.ff, wt = nb.ss;
+
+            // skip this edge
+            if (f < k) s.insert({d, node, f + 1});
+
+            // do not skip this edge
+            s.insert({d + wt, node, f});
+        }
+    }
+    vi ans(n+1, inf); ans[1] = 0;
+    rep(i,2,n+1)
+    {
+        rep(j,0,k+1) ans[i] = min(ans[i], dist[i][j]);
+    }
+    rep(i,1,n+1) cout << ans[i] << ' ';
+}
