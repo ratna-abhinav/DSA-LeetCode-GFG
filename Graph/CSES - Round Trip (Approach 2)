@@ -1,0 +1,55 @@
+vector<int> cycle;
+ 
+bool dfs_cycle(int x, int p, int par[], vi g[], vi &color)
+{
+	if (color[x] == 2) return 0;  // u can remove this, but it might TLE
+	if (color[x] == 1)	// cycle found
+	{
+		cycle.push_back(x);
+		cycle.push_back(p);
+		int v = p;
+		while (v != x)
+		{
+			v = par[v];
+			cycle.pb(v);
+		}
+		reverse(all(cycle));
+		return 1;
+	}
+ 
+	par[x] = p;
+	color[x] = 1;
+	for (auto nb:g[x])
+	{
+		if (nb == p) continue;
+		if (dfs_cycle(nb, x, par, g, color)) return 1;
+	}
+	color[x] = 2;
+	return 0;
+}	
+ 
+void solve()
+{
+	cin >> n >> m;
+	vi g[n+1];
+	rep(i,0,m)
+	{
+		int u,v; cin >> u >> v;
+		g[u].pb(v);
+		g[v].pb(u);
+	}
+	vi color(n+1, 0); int par[n+1] = {0};
+	rep(i,1,n+1)
+	{
+		if (color[i]==0)
+		{
+			if (dfs_cycle(i,0,par,g,color))
+			{
+				cout << len(cycle) << nl;
+				each(e,cycle) cout << e << ' ';
+				return;
+			}
+		}
+	}
+	cout << "IMPOSSIBLE";
+}
