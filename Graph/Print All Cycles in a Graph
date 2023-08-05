@@ -46,6 +46,7 @@ void dfs_cycle(int x, int p, int color[], int par[])
 	color[x] = 1;
 	for (int v : graph[x])
 	{
+		// if (nb == p) continue;	// uncomment it if graph is undirected
 		dfs_cycle(v, x, color, par);
 	}
 	color[x] = 2;
