@@ -1,0 +1,87 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 100000;
+
+#define all(v) v.begin(), v.end()
+#define unq(v) v.erase(unique(all(v)), v.end());
+
+vector<int> graph[N];
+vector<vector<int>> cycles;
+map<vector<int>, int> seen;
+
+void dfs_cycle(int x, int p, int color[], int par[])
+{
+	// if (color[x] == 2) {
+	// 	return;
+	// }
+
+	if (color[x] == 1)
+	{
+		vector<int> v;
+
+		int cur = p;
+		v.push_back(x);
+		v.push_back(cur);
+
+		while (cur != x)
+		{
+			cur = par[cur];
+			v.push_back(cur);
+		}
+		reverse(v.begin(), v.end());
+		vector<int> temp = v;
+		sort(all(temp));
+		unq(temp);
+
+		if (seen.count(temp) == 0)
+		{
+			cycles.push_back(v);
+			seen[temp];
+		}
+		return;
+	}
+
+	// normal DFS
+	par[x] = p;
+	color[x] = 1;
+	for (int v : graph[x])
+	{
+		dfs_cycle(v, x, color, par);
+	}
+	color[x] = 2;
+}
+
+void printCycles()
+{
+
+	for (int i = 0; i < cycles.size(); i++)
+	{
+		for (int x : cycles[i])
+			cout << x << " ";
+		cout << endl;
+	}
+}
+
+int main()
+{
+	int n, m;
+	cin >> n >> m;
+	while (m--)
+	{
+		int x, v;
+		cin >> x >> v;
+		graph[x].push_back(v);
+	}
+
+	int color[N], par[N];
+
+	for (int i = 1; i <= n; i++)
+	{
+		if (color[i] == 0)
+		{
+			dfs_cycle(i, 0, color, par);
+			printCycles();
+			cycles.clear();
+		}
+	}
+}
