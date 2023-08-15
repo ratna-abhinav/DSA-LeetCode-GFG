@@ -3,21 +3,6 @@
 using namespace std;
 using ll = long long;
 
-// struct node
-// {
-//  int sum, countOnes;
-//  node () {
-//      sum = 0;
-//      countOnes = 0;
-//  }
-
-//  node (int val) {
-//      this->sum = val;
-//      this->countOnes = val;
-//  }
-// };
-
-
 template <class T, class U>
 struct SegTree
 {
@@ -51,7 +36,6 @@ struct SegTree
     T combine(T l, T r)
     {
         T ans = l + r;
-        // ans.countOnes = l.countOnes + r.countOnes;
         return ans;
     }
 
@@ -60,7 +44,6 @@ struct SegTree
     {
         // query -> sum, update -> assignment
         T ans = tr-tl+1;
-        // ans.countOnes = tr - tl + 1;
         return ans;
     }
 
@@ -147,7 +130,6 @@ void solve()
     // range sum query and range OR update
     // so, we'll build seg_tree for each bit and count no of 1's in the range
 
-    // node idel;
     SegTree<int, int> st(n+1, 0, 0);
     for (int i = 1; i <= n; i++)
     {
