@@ -1,0 +1,196 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+// struct node
+// {
+//  int sum, countOnes;
+//  node () {
+//      sum = 0;
+//      countOnes = 0;
+//  }
+
+//  node (int val) {
+//      this->sum = val;
+//      this->countOnes = val;
+//  }
+// };
+
+
+template <class T, class U>
+struct SegTree
+{
+    vector<T> ST[6];
+    vector<U> LAZY[6];
+    ll n;
+    T IDENTITY_ELEMENT;
+    U IDENTITY_UPDATE;
+
+    /*
+            Definition of IDENTITY_ELEMENT: the element I such that combine(x,I) = x
+            for all x
+
+            Definition of IDENTITY_UPDATE: the element I such that apply(x,I) = x
+            for all x
+    */
+
+    SegTree(ll n, T IDENTITY_ELEMENT, U IDENTITY_UPDATE)
+    {
+        this->n = n;
+        this->IDENTITY_ELEMENT = IDENTITY_ELEMENT;
+        this->IDENTITY_UPDATE = IDENTITY_UPDATE;
+        for (int i = 0; i < 6; i++)
+        {
+            ST[i].assign(4 * n, IDENTITY_ELEMENT);
+            LAZY[i].assign(4 * n, IDENTITY_UPDATE);
+        }
+    }
+
+    // merge the answer of left and right child to get the answer that we want to store in the current node
+    T combine(T l, T r)
+    {
+        T ans = l + r;
+        // ans.countOnes = l.countOnes + r.countOnes;
+        return ans;
+    }
+
+    // we need to store and return the answer (depends on query type) that we want to store in the node corrosponding to the range [tl, tr] after applying the update upd
+    T apply(T curSegVal, U upd, ll tl, ll tr)
+    {
+        // query -> sum, update -> assignment
+        T ans = tr-tl+1;
+        // ans.countOnes = tr - tl + 1;
+        return ans;
+    }
+
+    // merge old and new update into one final merged update
+    U combineUpdate(U old_upd, U new_upd, ll tl, ll tr)
+    {
+        U ans = old_upd;
+        ans = max(old_upd, new_upd);
+        return ans;
+    }
+
+    void push_down(ll v, ll tl, ll tr, int bit)
+    {
+        // for the below line to work, make sure the "==" operator is defined for U.
+        if (LAZY[bit][v] == IDENTITY_UPDATE)
+            return;
+        ST[bit][v] = apply(ST[bit][v], LAZY[bit][v], tl, tr);
+        if (2 * v + 1 <= 4 * n)
+        {
+            ll tm = (tl + tr) >> 1;
+            LAZY[bit][2 * v + 1] = combineUpdate(LAZY[bit][2 * v + 1], LAZY[bit][v], tl, tm);
+            LAZY[bit][2 * v + 2] = combineUpdate(LAZY[bit][2 * v + 2], LAZY[bit][v], tm + 1, tr);
+        }
+        LAZY[bit][v] = IDENTITY_UPDATE;
+    }
+
+    T queryUtil(ll v, ll tl, ll tr, ll l, ll r, int bit)
+    {
+        push_down(v, tl, tr, bit);
+        if (l > r)
+            return IDENTITY_ELEMENT;
+        if (tr < l or tl > r)
+        {
+            return IDENTITY_ELEMENT;
+        }
+        if (l <= tl and r >= tr)
+        {
+            return ST[bit][v];
+        }
+        ll tm = (tl + tr) >> 1;
+        return combine(queryUtil(2 * v + 1, tl, tm, l, r, bit), queryUtil(2 * v + 2, tm + 1, tr, l, r, bit));
+    }
+
+    void updateUtil(ll v, ll tl, ll tr, ll l, ll r, U upd, int bit)
+    {
+        push_down(v, tl, tr, bit);
+        if (tr < l or tl > r)
+            return;
+        if (tl >= l and tr <= r)
+        {
+            LAZY[bit][v] = combineUpdate(LAZY[bit][v], upd, tl, tr);
+            push_down(v, tl, tr, bit);
+        }
+        else
+        {
+            ll tm = (tl + tr) >> 1;
+            updateUtil(2 * v + 1, tl, tm, l, r, upd, bit);
+            updateUtil(2 * v + 2, tm + 1, tr, l, r, upd, bit);
+            ST[bit][v] = combine(ST[bit][2 * v + 1], ST[bit][2 * v + 2]);
+        }
+    }
+
+    T query(ll l, ll r, int bit)
+    {
+        return queryUtil(0, 0, n - 1, l, r, bit);
+    }
+
+    void update(ll l, ll r, U upd, int bit)
+    {
+        updateUtil(0, 0, n - 1, l, r, upd, bit);
+    }
+};
+
+void solve()
+{
+    int n;
+    cin >> n;
+    vector<int> arr(n+1, 0);    // 1 <= arr[i] <= 31
+    for (int i = 1; i <= n; i++)
+    {
+        cin >> arr[i];
+    }
+
+    // range sum query and range OR update
+    // so, we'll build seg_tree for each bit and count no of 1's in the range
+
+    // node idel;
+    SegTree<int, int> st(n+1, 0, 0);
+    for (int i = 1; i <= n; i++)
+    {
+        for (int b = 0; b < 5; b++)
+        {
+            if ((arr[i] >> b) & 1)
+                st.update(i,i,1,b);
+        }
+    }
+
+    int q;
+    cin >> q;
+    while (q--)
+    {
+        int t, l, r, v;
+        cin >> t >> l >> r >> v;
+        if (t == 1)
+        {
+            for (int bit = 0; bit < 5; bit++)
+            {
+                if ((v >> bit) & 1)
+                    st.update(l, r, 1, bit);
+                else
+                    st.update(l, r, 0, bit);
+            }
+        }
+        else
+        {
+            int ans = 0;
+            for (int b=0; b<5; b++)
+            {
+                ans += (1<<b)*st.query(l,r,b);
+            }
+            cout << ans << '\n';
+        }
+    }
+}
+
+signed main()
+{
+    int t = 1;
+    for (int i = 0; i < t; i++)
+        solve();
+
+    return 0;
+}
