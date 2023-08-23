@@ -1,0 +1,24 @@
+vi find_order(vi out[], vi &in) 
+{
+	queue<int> q;
+	rep(i, 1, n+1)
+	{
+		if (in[i] == 0) q.push(i);
+	}
+
+	vi order;
+	while (not q.empty())
+	{
+		int cur = q.front();
+		q.pop();
+		order.pb(cur);
+
+		for (auto nb : out[cur])
+		{
+			in[nb]--;
+			if (in[nb] == 0) q.push(nb);
+		}
+	}
+	if (order.size() == n) return order;
+	return {};
+}
