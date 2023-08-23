@@ -1,0 +1,25 @@
+vector<int> siz, leader;
+void make_set(int x)
+{
+    leader[x] = x;
+    siz[x] = 1;
+}
+
+int find_leader(int x)
+{
+    if (x == leader[x]) return x;
+    return leader[x] = find_leader(leader[x]);
+}
+
+void merge(int x, int y)
+{
+    x = find_leader(x);
+    y = find_leader(y);
+
+    if (x == y) return;
+
+    if (siz[x] < siz[y]) swap(x, y);
+
+    leader[y] = x;
+    siz[x] += siz[y];
+}
