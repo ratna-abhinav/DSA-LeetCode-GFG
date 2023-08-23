@@ -1,0 +1,16 @@
+vector<int> next_smaller(vector<int> &a, int n)
+{
+    stack<int> st;
+    vector<int> ans(n, n);
+
+    for (int i = 0; i < n; i++)
+    {
+        while (not st.empty() and a[st.top()] > a[i])
+        {
+            ans[st.top()] = a[i];
+            st.pop();
+        }
+        st.push(i);
+    }
+    return ans;
+}
