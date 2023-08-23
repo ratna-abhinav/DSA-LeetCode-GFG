@@ -1,0 +1,37 @@
+const int MX = 5e4+2;
+vb is_prime(MX+1, 1);
+vi primes;	// store all primes till MX
+ 
+void prime_sieve()
+{
+	is_prime[1] = 0;
+	for (int i = 2; i * i <= MX; i++)
+	{
+		if (is_prime[i])
+		{
+			for (int j=i*i; j<MX; j+=i) is_prime[j] = 0;
+		}
+	}
+ 
+ 	primes.pb(2);
+	for (int i=3; i<MX; i+=2)
+	{
+		if (is_prime[i]) primes.pb(i);
+	}
+}
+ 
+// to prime factorise numbers <= 1e9, we stored all primes till sqrt(1e9)
+vi prime_factorise(int n)
+{
+	vi ret;
+	for (auto pr : primes)
+	{
+		if (n%pr == 0)
+		{
+			ret.pb(pr);
+			while (n%pr == 0) n /= pr;
+		}
+	}
+	if (n > 1) ret.pb(n);
+	return ret;
+}
