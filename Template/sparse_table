@@ -1,0 +1,38 @@
+const int MAX_N = 100005;
+const int LOG = 17;
+int ST[MAX_N][LOG];
+
+int query(int l, int r, bool idempotent)
+{
+	int len = r-l+1, ans = 1e9+1;
+	for (int bit = LOG; bit >= 0; bit--)
+	{
+		if (len&(1<<bit))
+		{
+			ans = min(ans, ST[l][bit]);
+			l += (1<<bit);
+		}
+	}
+	return ans;
+}
+
+int query(int l, int r) 
+{
+	int len = r-l+1;
+	int j = 31 - __builtin_clz(len);
+	return min(ST[l][j], ST[r - (1<<j) + 1][j]);
+}
+
+void build(vi &a)
+{
+	int n = len(a);
+	for (int i=0; i<n; i++) ST[i][0] = a[i];
+
+	for (int j=1; j<LOG; j++)
+	{
+		for (int i=0; i+(1<<j)-1<n; i++)
+		{
+			ST[i][j] = min(ST[i][j-1], ST[i + (1 << (j-1))][j-1]);
+		}
+	}
+}
