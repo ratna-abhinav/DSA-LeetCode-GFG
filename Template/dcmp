@@ -1,0 +1,8 @@
+vector<string> tokenize(string s, char delimeter)
+{
+    vector<string> tokens;
+    stringstream temp(s);
+    string idm;
+    while (getline(temp, idm, delimeter)) tokens.push_back(idm);
+    return tokens;
+}
