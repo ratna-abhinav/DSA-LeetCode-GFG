@@ -1,0 +1,26 @@
+// OR of subarray [l, r] -> calc_sub_or(l, r);
+int calc_sub_or(int l, int r, vvi &set_bits)
+{
+	int orr = 0;
+	rep(bit,0,31)
+	{
+		int cnt = set_bits[r][bit];
+		if (l > 0) cnt -= set_bits[l-1][bit];
+		if (cnt > 0) orr |= (1<<bit);
+	}
+	return orr;
+}
+
+vvi set_bits(n, vi(31, 0));
+rep(i,0,n)
+{
+	rep(bit,0,31)
+	{
+		if (a[i]&(1<<bit)) set_bits[i][bit]++;
+	}
+}
+
+rep(i,1,n)
+{
+	rep(bit,0,31) set_bits[i][bit] += set_bits[i-1][bit];
+}
