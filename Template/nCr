@@ -1,0 +1,29 @@
+const int maxn = 5e5, mod = 998244353;
+int fact[maxn], inverse_fact[maxn];
+ 
+int add(int x, int y) { int res = x + y; return (res >= mod ? res - mod : res); }
+int sub(int x, int y) { int res = x - y; return (res < 0 ? res + mod : res); }
+int mul(int x, int y) { x %= mod, y %= mod; int res = x * y; return (res >= mod ? res % mod : res); }
+int mod_pow(int x, int y) { if (y <= 0) return 1; int ans = 1; x %= mod; while (y) { if (y & 1) ans = mul(ans, x); x = mul(x, x); y >>= 1; } return ans; }
+int mod_inverse(int x) {return mod_pow(x, mod - 2);}
+ 
+void precompute()
+{
+    fact[0] = 1, fact[1] = 1;
+ 
+    for (int i = 2; i < maxn; i++) fact[i] = mul(fact[i - 1], i);
+ 
+    inverse_fact[maxn - 1] = mod_inverse(fact[maxn - 1]);
+ 
+    for (int i = maxn - 2; i >= 0; i--) inverse_fact[i] = mul(inverse_fact[i + 1], i + 1);
+}
+ 
+int nCr(int n, int r)
+{
+    if (r > n or r < 0 or n < 0) return 0;
+    if (r == 0 or n == 0 or r == n) return 1;
+ 
+    int ans = mul(fact[n], mul(inverse_fact[r], inverse_fact[n - r]));
+ 
+    return ans;
+}
