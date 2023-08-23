@@ -1,0 +1,7 @@
+#define set(num, bit) (num |= (1ll << bit))
+#define unset(num, bit) (num &= ~(1ll << bit))
+#define toggle(num, bit) (num ^= (1ll << bit))
+bool is_set(int num, int bit) {return ((num >> bit) & 1ll);}
+int ceil_div(int x, int y) {int d = (x + y - 1) / y; return d;}
+int msb(int num) {int bit = 31 - __builtin_clz(num); return bit;}
+int next_pow_2(int num) {int x = 1; while(x <= num) x = x << 1ll; return x;}
