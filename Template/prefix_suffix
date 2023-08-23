@@ -1,0 +1,32 @@
+vvi pref_min(n+1, vi(n+1, 0));
+vvi suff_min(n+1, vi(n+1, 0));
+
+for (int i=1; i<=n; i++) pref_min[a[i-1]][i]++;
+for (int i=n; i>=1; i--) suff_min[a[i-1]][i]++;
+
+for (int i=1; i<=n; i++)
+{
+		// i -> ind, j -> element value (not element index)
+		for (int j=1; j<=n; j++) pref_min[j][i] += pref_min[j][i-1];
+}
+
+for (int i=n-1; i>=0; i--)
+{
+		for (int j=1; j<=n; j++) suff_min[j][i] += suff_min[j][i+1];
+}
+
+// pref_min[j][i] -> count of the no j till ith ind from front in p[]
+// suff_min[j][i] -> count of the no j till ith ind from back in p[]
+
+for (int i=1; i<=n; i++)
+{
+		for (int j=1; j<=n; j++) pref_min[j][i] += pref_min[j-1][i];
+}
+
+for (int i=n; i>=1; i--)
+{
+		for (int j=1; j<=n; j++) suff_min[j][i] += suff_min[j-1][i];
+}
+
+// pref_min[j][i] -> stores the count of nos <= j and with index <= i
+// suff_min[j][i] -> stores the count of nos <= j and with index >= i
