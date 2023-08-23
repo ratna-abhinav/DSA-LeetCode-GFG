@@ -1,0 +1,68 @@
+#define lc (x << 1)
+#define rc (x << 1) | 1
+
+struct node
+{
+		
+};
+
+int N;
+vector<int> a;
+vector<node> ST;
+
+node combine(int x, node lc_val, node rc_val)
+{
+		node ans;
+		return ans;
+}
+
+void build(int x = 1, int l = 1, int r = N + 1)
+{
+		// Base Case
+		if (l == r - 1)
+		{
+				ST[x] = a[l];
+				return;
+		}
+
+		int mid = (l + r) / 2;
+		build(lc, l, mid);
+		build(rc, mid, r);
+
+		// Combine ST[lc] and ST[rc]]
+		ST[x] = combine(x, ST[lc], ST[rc]);
+}
+
+node query(int L, int R, int x = 1, int l = 1, int r = N + 1)
+{
+		// Base Case
+		if (l >= R or r <= L) return {0, 0};
+		if (l >= L and r <= R) return ST[x];
+
+		int mid = (l + r) / 2;
+		node lc_val = query(L, R, lc, l, mid);
+		node rc_val = query(L, R, rc, mid, r);
+
+		// Combine
+		node ans;
+		ans = combine(x, lc_val, rc_val);
+		return ans;
+}
+
+void update(int pos, int val, int x = 1, int l = 1, int r = N + 1)
+{
+		if (pos < l or pos >= r) return;
+		if (l == r - 1)
+		{
+				ST[x] = val;
+				a[pos] = val;
+				return;
+		}
+
+		int mid = (l + r) / 2;
+		update(pos, val, lc, l, mid);
+		update(pos, val, rc, mid, r);
+
+		// Combine
+		ST[x] = combine(x, ST[lc], ST[rc]);
+}
