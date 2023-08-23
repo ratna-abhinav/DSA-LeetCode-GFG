@@ -1,0 +1,17 @@
+const int MX = 1e7+2;
+vi spf(MX+1);
+
+void factor_sieve()
+{
+	rep(i,1,MX) spf[i] = i;
+	for (int i=2; i*i<=MX; i++)
+	{
+		if (spf[i] == i)
+		{
+			for (int j=i*i; j<MX; j+=i)
+			{
+				if (spf[j] == j) spf[j] = i;
+			}
+		}
+	}
+}
