@@ -1,0 +1,41 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+// Min no of adjacent merge operations required to sort the a[] in non-increasing order
+// a[] -> [1 5 3 9 1], ans = 2
+
+void solve()
+{
+	int n; cin >> n;
+	vector<int> arr(n);
+	for (int i=0; i<n; i++) cin >> arr[i];
+	vector<int> dp(n+1, 0), sdp(n+1, 0);
+	dp[n-1] = 0; sdp[n-1] = arr[n-1];
+
+	for (int i=n-2; i>=0; i--)
+	{
+		int sum = arr[i];
+		int j = i;
+		while (j+1 < n and sum < sdp[j+1])
+		{
+			j += 1;
+			sum += arr[j];
+		}
+		sdp[i] = sum;
+		dp[i] = j-i + dp[j+1];
+	}
+
+	for (int i=0; i<n; i++) cout << sdp[i] << ' '; cout << endl;
+	cout << dp[0] << endl;
+}
+
+signed main()
+{
+	int t = 1;
+	for (int i = 0; i < t; i++)
+		solve();
+
+	return 0;
+}
