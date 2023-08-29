@@ -1,0 +1,39 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+using ll = long long;
+
+vector<int> arr;
+int n;
+
+int rec(int i, int prevId)
+{
+	// base case
+	if (i == n) return 0;
+
+	// take the current el
+	int ans = 0;
+	if (prevId == -1 or (arr[i] > arr[prevId] and arr[i] - arr[prevId] >= i - prevId)) 
+		ans = 1 + rec(i+1, i);
+	ans = max(ans, rec(i+1, prevId));
+	return ans;
+}
+
+void solve()
+{
+	cin >> n;
+	arr.resize(n);
+	for (int i=0; i<n; i++) cin >> arr[i];
+
+	int lis = rec(0, -1);
+	cout << n - lis << endl;
+}
+
+signed main()
+{
+	int t = 1;
+	for (int i = 0; i < t; i++)
+		solve();
+
+	return 0;
+}
