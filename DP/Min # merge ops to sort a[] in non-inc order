@@ -5,6 +5,7 @@ using ll = long long;
 
 // Min no of adjacent merge operations required to sort the a[] in non-increasing order
 // a[] -> [1 5 3 9 1], ans = 2
+// a[] -> [-2 8 10 1 1 1], ans = 2  (if u replace sum += arr[j] with sum += sdp[j], u'll see that the answer will come out as 1 which is wrong)
 
 void solve()
 {
