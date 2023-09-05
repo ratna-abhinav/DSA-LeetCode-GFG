@@ -6,6 +6,7 @@
 using namespace std;
 
 int n;
+// rec(i) -> maximum alternating sum subarray starting from index i
 int rec(int i, int par, vector<int> &arr)
 {
     // base case
