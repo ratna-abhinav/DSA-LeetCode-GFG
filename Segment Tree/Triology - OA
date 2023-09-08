@@ -1,0 +1,199 @@
+#include <bits/stdc++.h>
+#define int long long
+using namespace std;
+
+/* 
+  Support 3 queries. 1 <= A[i] <= 31, N <= 1e5
+  1. [1,l,r,v] -> set [l,r] to v
+  2. [2,l,r,v] -> do a[i] |= v for all i in [l,r]
+  3. [3,l,r]   -> find the sum of bitwise AND of all the subarrays in [l,r]
+*/
+
+const int INF = 1e15;
+
+struct node {
+    int pf1 = 0, sf1 = 0, cnt1 = 0;
+    node(int v1, int v2, int v3) {
+        pf1 = v1;
+        sf1 = v2;
+        cnt1 = v3;
+    }
+};
+
+template <class T>
+class ST
+{
+private:
+    int n, N;
+    const T O{0ll, 0ll, 0ll};
+    vector<T> seg;
+    vector<array<int, 2>> lazy;
+
+public:
+    ST() {}
+    ST(int _n) : n(_n), N(4 << __lg(n - 1))
+    {
+        seg.assign(N + 2, O);
+        lazy.assign(N + 2, {0, 0});
+    }
+    
+    T op(T l, T r, int sz1, int sz2)
+    {
+        T ans(0,0,0);
+
+        // find new pf1
+        if (l.pf1 == sz1) // all l is 1
+        {
+            ans.pf1 = l.pf1 + r.pf1;
+        }
+        else ans.pf1 = l.pf1;
+
+        // find new sf1
+        if (r.sf1 == sz2) ans.sf1 = l.sf1 + r.sf1;
+        else ans.sf1 = r.sf1;
+
+        // find new cnt1
+        ans.cnt1 = l.cnt1 + r.cnt1 + (l.sf1 * r.pf1);
+        return ans;
+    }
+
+    void buildTree(int x, int s, int e, vector<node> &arr)
+    {
+        if (s == e)
+        {
+            seg[x] = arr[s];
+        }
+        else
+        {
+            int mid = (s + e) / 2;
+            buildTree(2 * x, s, mid, arr);
+            buildTree(2 * x + 1, mid + 1, e, arr);
+            seg[x] = op(seg[2 * x], seg[2 * x + 1], mid - s + 1, e - mid);
+        }
+    }
+
+    void push(int x, int s, int e)
+    {
+        if (e < s)
+            return;
+        if (lazy[x][1])   // set is there
+        {
+            int val = (e - s + 1) * lazy[x][0];
+            seg[x].pf1 = val;
+            seg[x].sf1 = val;
+            seg[x].cnt1 = (val * (val + 1)) / 2;
+        }
+
+        if (s != e)
+        {
+            if (lazy[x][1])
+            {
+                lazy[2 * x] = lazy[x];
+                lazy[2 * x + 1] = lazy[x];
+            }
+        }
+        lazy[x] = {0, 0};
+    }
+
+    void setRange(int x, int s, int e, int l, int r, int u)
+    {
+        if (e < s or s > r or e < l)
+            return;
+        push(x, s, e);
+        if (l <= s and r >= e)
+        {
+            lazy[x] = {u, 1};
+            return;
+        }
+        int m = (s + e) >> 1;
+        setRange(x << 1, s, m, l, r, u), setRange(x << 1 | 1, m + 1, e, l, r, u);
+        push(x << 1, s, m), push(x << 1 | 1, m + 1, e);
+        seg[x] = op(seg[x << 1], seg[x << 1 | 1], m - s + 1, e - m);
+    }
+
+    T _query(int x, int s, int e, int l, int r)
+    {
+        if (l > e or r < s or s > e)
+            return O;
+        push(x, s, e);
+        if (l <= s and r >= e)
+        {
+            return seg[x];
+        }
+        int m = (s + e) >> 1;
+        T lval = _query(x << 1, s, m, l, r);
+        T rval = _query(x << 1 | 1, m + 1, e, l, r);
+        return op(lval, rval, m - s + 1, e - m);
+    }
+
+    T query(int l, int r) { return l > r ? O : _query(1, 1, n, l, r); }
+
+    void build(vector<node> &arr) { buildTree(1, 1, n, arr); }
+    void set(int l, int r, int u) { setRange(1, 1, n, l, r, u); }
+};
+
+void solve()
+{
+    int n;
+    cin >> n;
+    vector<int> a(n + 1);
+    for (int i = 1; i <= n; i++)
+        cin >> a[i];
+
+    vector<ST<node>> st(5, ST<node>(n + 1)); // 5 segment trees
+
+    for (int bit = 0; bit < 5; bit++)
+    {
+        vector<node> arr(n + 1, node(0, 0, 0));
+        for (int i = 1; i <= n; i++)
+        {
+            if ((a[i] >> bit) & 1)
+                arr[i] = {1, 1, 1};
+        }
+        st[bit].build(arr);
+    }
+
+    int q; cin >> q;
+    for (int i = 0; i < q; i++)
+    {
+        int type, l, r, v;
+        cin >> type >> l >> r >> v;
+        if (type == 1)
+        {
+            // set range
+            for (int bit = 0; bit < 5; bit++)
+            {
+                if ((v >> bit) & 1)
+                    st[bit].set(l, r, 1);
+                else st[bit].set(l, r, 0);
+            }
+        }
+        else if (type == 2)
+        {
+            // range or
+            for (int bit = 0; bit < 5; bit++)
+            {
+                if ((v >> bit) & 1)
+                    st[bit].set(l, r, 1);
+            }
+        }
+        else
+        {
+            int ans = 0;
+            for (int bit = 0; bit < 5; bit++)
+            {
+                ans += (1 << bit) * (st[bit].query(l, r).cnt1);
+            }
+            cout << ans << ' ';
+        }
+    }
+    cout << endl;
+}
+
+int32_t main()
+{
+    int t = 1;
+    cin >> t;
+    while (t--) solve();
+    return 0;
+}
