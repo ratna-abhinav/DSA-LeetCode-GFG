@@ -1,0 +1,80 @@
+/*
+  https://www.codingninjas.com/studio/contests/weekend-contest-94/9696653/problems/27364?leftPanelTab=0
+  For every index i, find the maximum element less than a[i] in index range [prev_occ[a[i]], i]]
+  if no previous occurence, then find in [0, i]. If no such element exists, print -1
+*/
+
+#define lc (x << 1)
+#define rc (x << 1) | 1
+
+int N;
+vector<int> ST;
+
+int combine(int x, int lc_val, int rc_val)
+{
+	return max(lc_val, rc_val);
+}
+
+int query(int L, int R, int x = 1, int l = 1, int r = N + 1)
+{
+	// Base Case
+	if (l >= R or r <= L) return 0;
+	if (l >= L and r <= R) return ST[x];
+
+	int mid = (l + r) / 2;
+	int lc_val = query(L, R, lc, l, mid);
+	int rc_val = query(L, R, rc, mid, r);
+
+	// Combine
+	int ans;
+	ans = combine(x, lc_val, rc_val);
+	return ans;
+}
+
+void update(int pos, int val, int x = 1, int l = 1, int r = N + 1)
+{
+	if (pos < l or pos >= r) return;
+	if (l == r - 1)
+	{
+		ST[x] = val;
+		return;
+	}
+
+	int mid = (l + r) / 2;
+	update(pos, val, lc, l, mid);
+	update(pos, val, rc, mid, r);
+
+	// Combine
+	ST[x] = combine(x, ST[lc], ST[rc]);
+}
+
+
+vector<int> ninjaAndLessMaxElement(int n, vector<int> &a) {
+	N = n;
+	ST.assign(4*N, 0);
+	vector<int> ans(n, -1);
+
+	vector<int> mp[n+1];
+	for (int i=0; i<n; i++) mp[a[i]].push_back(i);
+
+	for (int i = 1; i <= n; i++)
+	{
+		auto v = mp[i];
+
+		for (int i=0; i<v.size(); i++)
+		{
+			if (i == 0)
+			{
+				int mx = query(1, v[i]+2);
+				if (mx != 0) ans[v[i]] = mx;
+			}
+			else
+			{
+				int mx = query(v[i-1]+1, v[i]+2);
+				if (mx != 0) ans[v[i]] = mx;
+			}
+		}
+		for (auto e:v) update(e+1, i);
+	}
+	return ans;
+}
