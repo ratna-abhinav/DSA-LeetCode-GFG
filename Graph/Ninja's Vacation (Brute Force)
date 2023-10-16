@@ -1,0 +1,45 @@
+Q. We have to count number of ways to visit all the nodes such that the order of nodes visited is different for every paths
+i.e., if two paths have the order of nodes visited, then they are treated as same way. U are allowed to visit a vertex more than once.
+
+T.C = O(N * N!)
+#include <bits/stdc++.h>
+
+int numWays(int n, vector<vector<int>> &cities, int m) {
+    
+    vector<int> graph[n+1];
+    for (auto e:cities)
+    {
+        graph[e[0]].push_back(e[1]);
+        graph[e[1]].push_back(e[0]);
+    }
+
+    vector<int> paths;
+    for (int i=1; i<=n; i++) paths.push_back(i);
+    int ans = 0, mod = 1e9+7;
+    
+    do
+    {
+        // consider current permutation as order of visited nodes
+        // so check for validity of current visited order
+        unordered_map<int,int> neighbors;
+        neighbors[paths[0]];
+        for (auto nb:graph[paths[0]]) neighbors[nb];
+        bool ok = 1;
+        
+        for (int i=1; i<n; i++)
+        {
+            // check if we can reach paths[i] the node from already visited nodes
+            // we can reach it, if it's neighbor of any of the earlier visited nodes
+            // so store all the neighbors
+            if (!neighbors.count(paths[i]))
+            {
+                ok = 0;
+                break;
+            }
+            for (auto nb : graph[paths[i]]) neighbors[nb];
+        }
+        if (ok) ans = (ans + 1) % mod;
+        
+    } while (next_permutation(paths.begin(), paths.end()));
+    return ans;
+}
