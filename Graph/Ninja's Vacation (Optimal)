@@ -1,0 +1,53 @@
+Current T.C with memoization: O((n+m)^2 * 2^n)
+but u can optimize it to: O(n+m * 2^n), refer to OneNote for that
+
+#include <bits/stdc++.h>
+
+int n; const int mod = 1e9+7;
+vector<vector<int>> graph;
+bool check(int mask, int node)
+{
+    for (int i=0; i<n; i++)
+    {
+        if ((mask >> i) & 1)
+        {
+            for (auto nb:graph[i])
+            {
+                if (nb==node) return true;
+            }
+        }
+    }
+    return false;
+}
+
+int rec(int mask)
+{
+    // basecase
+    if (mask == (1<<n)-1) return 1;
+
+    // try to go to the next node that will be visited in the visited order
+    int ans = 0;
+    for (int j=0; j<n; j++)
+    {
+        if (!((mask >> j) & 1) and check(mask, j))
+        {
+            ans = (ans + rec(mask|(1<<j))) % mod;
+        }
+    }
+    return ans;
+}
+
+int numWays(int N, vector<vector<int>> &cities, int m) {
+    n = N;
+    graph.clear(); graph.resize(n);
+    for (auto e:cities)
+    {
+        graph[e[0]-1].push_back(e[1]-1);
+        graph[e[1]-1].push_back(e[0]-1);
+    }
+
+    int ans = 0;
+    for (int i=0; i<n; i++) ans = (ans + rec(1<<i)) % mod;
+    
+    return ans;
+}
