@@ -3,19 +3,16 @@
 vector<string> findItinerary(vector<vector<string>>& tickets) {
     int n = tickets.size();
     unordered_map<string, vector<string>> g;
-    unordered_map<string, int> out;
     map<pair<string,string>,int> vis, count;
     for (int i=0; i<n; i++) 
     {
         g[tickets[i][0]].push_back(tickets[i][1]);
         count[{tickets[i][0], tickets[i][1]}]++;
-        out[tickets[i][0]]++;
     }
     vector<string> ans;
     
     function<void(string)> dfs = [&] (string cur)
     {
-        out[cur] = max(out[cur]-1, 0);
         vector<string> next;
         for (auto nb:g[cur])
         {
@@ -32,8 +29,7 @@ vector<string> findItinerary(vector<vector<string>>& tickets) {
         // well this condition (out[cur] == 0) is implicit, cuz
         // we enter this section for cur only after visiting all of its
         // outgoing edges (or neighbors in case of normal dfs)
-        // so below line is same as just writing:                 ans.push_back(cur)
-        if (out[cur] == 0) ans.push_back(cur);
+        ans.push_back(cur);
     };
     
     dfs("JFK");
