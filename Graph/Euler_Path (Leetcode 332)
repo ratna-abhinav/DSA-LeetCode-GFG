@@ -21,7 +21,7 @@ vector<string> findItinerary(vector<vector<string>>& tickets) {
         sort(next.begin(), next.end());
         for (auto nb : next) 
         {
-            if (vis[{cur, nb}] == count[{cur, nb}]) continue;
+            if (vis[{cur, nb}] == count[{cur, nb}]) continue;    // u need to write this line
             vis[{cur, nb}]++;
             dfs(nb);
         }
