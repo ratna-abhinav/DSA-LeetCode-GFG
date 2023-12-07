@@ -1,0 +1,39 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+#define rep(i,a,b) for(int i=a; i<b; i++)
+
+int getAns(int n)
+{
+	int dp[n+1] = {0};
+	dp[1] = 2; dp[2] = 9;
+	for (int i=3; i<=n; i++)
+	{
+		dp[i] = 4*dp[i-1] - dp[i-2] + 2 * pow(-1, i);
+	}
+	return dp[n];
+}
+
+// U are given a 1*1*2 tile, find no of ways to tile 2*2*N structure, where N <= 1e5
+// I/O: (n=2, o/p=9), (n=3, o/p=32), (n=4, o/p=121), (n=5, o/p=450)
+
+void solve()
+{
+	int n; cin >> n;
+	int dp[n+2][2] = {0};
+	dp[1][0] = 2; dp[2][0] = 9; dp[2][1] = 4;
+
+	// dp[i][0]: no of ways to fully fill till height i
+	for (int i=3; i<=n; i++)
+	{
+		dp[i][1] = dp[i-2][0]*4 + dp[i-1][1];
+		dp[i][0] = dp[i-1][0]*2 + dp[i-2][0] + dp[i][1];
+	}
+	cout << dp[n][0] << ' ' << getAns(n) << endl;
+}
+
+int main()
+{
+	solve();
+}
