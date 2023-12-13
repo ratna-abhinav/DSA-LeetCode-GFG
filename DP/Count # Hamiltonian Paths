@@ -37,6 +37,8 @@ void solve()
 	int ans = 0;
 	rep(i,0,n) ans += rec(i, 1<<i);
 	cout << ans;
+
+	// in case of undirected graph, u have to do ans/2
 }
 
 int main()
