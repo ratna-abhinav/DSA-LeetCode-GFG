@@ -1,0 +1,55 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+#define rep(i,a,b) for(int i=a; i<b; i++)
+
+int n, m;
+vector<vector<int>> graph;
+int hasEdge[22][22];
+
+// for COMPLETE GRAPH of 4 nodes, ans = 6
+// for ________ 3 nodes, ans = 2
+// for ________ 5 node, ans = 24
+
+// let's take example of n = 4
+// {0 1 2 3}, {0 1 3 2}, {0 2 3 1}, {0 2 1 3}, {0 3 1 2}, {0 3 2 1}
+// this was the answer if order of visited nodes mattered
+// but if we talk about different paths (i.e., different path diagram),
+// then do ans = ans / 2
+
+
+// rec(i, mask): no of hamiltonian cycle starting and ending at node x
+int rec(int i, int mask, int x)
+{
+	if (mask == (1<<n)-1) return hasEdge[x][i] == 1;
+
+	int ans = 0;
+	for (auto nb : graph[i])
+	{
+		if ((mask >> nb) & 1) continue;
+		ans += rec(nb, mask | (1<<nb), x);
+	}
+	return ans;
+}
+
+void solve()
+{
+	cin >> n >> m;
+	graph.resize(n);
+	rep(i,0,m)
+	{
+		int u, v; cin >> u >> v;
+		graph[u].push_back(v);
+		graph[v].push_back(u);
+		hasEdge[u][v] = hasEdge[v][u] = 1;
+	}  
+
+  // no of Hamiltonian cycles starting and ending at node 0
+	cout << rec(0,1,0);
+}
+
+int main()
+{
+	solve();
+}
