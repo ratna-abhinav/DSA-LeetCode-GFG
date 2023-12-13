@@ -1,0 +1,45 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+#define rep(i,a,b) for(int i=a; i<b; i++)
+
+int n, m;
+vector<vector<int>> graph;
+
+// Directed Graph
+
+// rec(i, mask): no of hamiltonian walks starting at node i
+int rec(int i, int mask)
+{
+	if (mask == (1<<n)-1) return 1;
+
+	int ans = 0;
+	for (auto nb : graph[i])
+	{
+		if ((mask >> nb) & 1) continue;
+		ans += rec(nb, mask | (1<<nb));
+	}
+	return ans;
+}
+
+void solve()
+{
+	cin >> n >> m;
+	graph.resize(n);
+	rep(i,0,m)
+	{
+		int u, v; cin >> u >> v;
+		graph[u].push_back(v);
+		// graph[v].push_back(u);
+	}
+
+	int ans = 0;
+	rep(i,0,n) ans += rec(i, 1<<i);
+	cout << ans;
+}
+
+int main()
+{
+	solve();
+}
