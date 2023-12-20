@@ -1,34 +1,29 @@
 // If graph as Euler Cycle, then this algorithm finds the euler cycle
+// Earlier version was O(N^2), u can confirm it with Leetcode 2097
+// this version is the best way and it is O(N+M)
 
 vector<string> findItinerary(vector<vector<string>>& tickets) {
     int n = tickets.size();
-    unordered_map<string, vector<string>> g;
+    unordered_map<string, vector<string>> graph;
+    unordered_map<string, int> out;
     map<pair<string,string>,int> vis, count;
     for (int i=0; i<n; i++) 
     {
-        g[tickets[i][0]].push_back(tickets[i][1]);
+        graph[tickets[i][0]].push_back(tickets[i][1]);
         count[{tickets[i][0], tickets[i][1]}]++;
+        out[tickets[i][0]]++;
     }
+    // do this, so that we always take the smallest neighbour first in our DFS
+    for (auto &it : graph) sort(it.second.rbegin(), it.second.rend());
     vector<string> ans;
-    
+
     function<void(string)> dfs = [&] (string cur)
     {
-        vector<string> next;
-        for (auto nb:g[cur])
+        while (out[cur] > 0)
         {
-            if (vis[{cur, nb}] < count[{cur, nb}]) next.push_back(nb);
+            string next = graph[cur][--out[cur]];
+            dfs(next);
         }
-        sort(next.begin(), next.end());
-        for (auto nb : next) 
-        {
-            if (vis[{cur, nb}] == count[{cur, nb}]) continue;    // u need to write this line
-            vis[{cur, nb}]++;
-            dfs(nb);
-        }
-        // push the node only if we have visited all of its edges
-        // well this condition (out[cur] == 0) is implicit, cuz
-        // we enter this section for cur only after visiting all of its
-        // outgoing edges (or neighbors in case of normal dfs)
         ans.push_back(cur);
     };
     
