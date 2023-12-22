@@ -1,0 +1,26 @@
+// here, we are finding shortest subarray with gcd = 1
+
+unordered_map<int,int> vals;
+int ans = 1e8;
+for (int i=0; i<n; i++)
+{
+    unordered_map<int,int> nvals;
+    nvals[nums[i]] = i;
+  
+    for (auto [v, id] : vals)
+    {
+        int gcd = __gcd(v, nums[i]);
+        if (nvals.count(gcd)) nvals[gcd] = max(nvals[gcd], id);
+        else nvals[gcd] = id;
+    }
+    // vals[g] = id, means that subarray [id, i] has its GCD = g and
+    // [id, i] is the shortest subarray ending at i and having GCD = g
+  
+    if (nvals.count(1))
+    {
+        int id = nvals[1];
+        // shortest subarray with gcd as 1 = [id, i]
+        ans = min(ans, i-id+n-1);
+    }
+    swap(vals, nvals);
+}
