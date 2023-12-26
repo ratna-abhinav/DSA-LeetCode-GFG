@@ -1,0 +1,10 @@
+struct pointer_hash 
+{
+    size_t operator()(const TreeNode* obj) const {
+        return std::hash<const void*>()(obj);
+    }
+};
+
+unordered_map<TreeNode*, int, pointer_hash> my_map
+
+// source - chatGPT
