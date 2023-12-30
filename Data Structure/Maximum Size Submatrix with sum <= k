@@ -1,0 +1,74 @@
+/*
+    You've given a matrix containing non-negative elements. Find the maximum size submatrix having sum of elements less than or equal to K.
+    Note: The sum of elements in an empty-submatrix (size 0) is 0.
+
+    T.C = O(N^2 * M)
+*/
+
+
+int n, m;
+const int inf = 1e18;
+
+int k;
+vvi mat;
+
+int calc(vi &arr)
+{
+	int ans = 0, r = -1, sum = 0;
+	for(int i=0; i<n; i++)
+	{
+		sum += arr[i];
+		if (sum <= k) r = i;
+		else
+		{
+			sum -= arr[i];
+			break;
+		}
+	}
+	ans = max(ans, r+1);
+
+	for (int i=1; i<n; i++)
+	{
+		if (r < i)
+		{
+			sum = 0;
+			r = i-1;
+		}
+		else sum -= arr[i-1];
+		while (r+1<n and sum+arr[r+1] <= k) r++, sum += arr[r];
+		ans = max(ans, r-i+1);
+	}
+	return ans;
+}
+
+void solve()
+{
+	cin >> n >> m >> k;
+	mat.assign(n, vi(m,0));
+	rep(i,0,n)
+	{
+		rep(j,0,m) cin >> mat[i][j];
+	}
+
+	int ans = 0;
+	rep(i,0,m)
+	{
+		vi cur(n,0);
+		rep(j,i,m)
+		{
+			rep(t,0,n) cur[t] += mat[t][j];
+
+			// given an array cur[], find the longest subarray with sum <= k
+			ans = max(ans, (j-i+1) * calc(cur));
+		}
+	}
+	cout << ans << nl;
+}
+
+signed main()
+{
+	IO();
+
+	testcase(_t);
+	// solve();
+}
