@@ -1,0 +1,188 @@
+/*
+  Given 3x3 matrix with some configuration of 'O' and 'X'. Currently it's your turn, find out whether you can win or not, if both players
+  play optimally. Also output the coordinates of your first move and this coordinate must be the your most optimal first move.
+
+  CODING NINJA'S TEST CASE-5 ANSWER WAS WRONG, BELOW IS THE CORRECT CODE.
+*/
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int row, col;
+
+int winner(vector<string> &mat)
+{
+  int cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[i][0] == 'X') cx++;
+    if (mat[i][0] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[i][2] == 'X') cx++;
+    if (mat[i][2] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[0][i] == 'X') cx++;
+    if (mat[0][i] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[2][i] == 'X') cx++;
+    if (mat[2][i] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[i][i] == 'X') cx++;
+    if (mat[i][i] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[1][i] == 'X') cx++;
+    if (mat[1][i] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0, co = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    if (mat[i][1] == 'X') cx++;
+    if (mat[i][1] == 'O') co++;
+  }
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  cx = 0;
+  co = 0;
+  if (mat[1][1] == 'X') cx++;
+  if (mat[1][1] == 'O') co++;
+  if (mat[2][0] == 'X') cx++;
+  if (mat[2][0] == 'O') co++;
+  if (mat[0][2] == 'X') cx++;
+  if (mat[0][2] == 'O') co++;
+  if (cx == 3) return 1;
+  if (co == 3) return 0;
+
+  int count = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      if (mat[i][j] != '_') count++;
+    }
+  }
+  if (count == 9) return -2;
+
+  return -1;
+}
+
+// 1 -> X wins, 0 -> draw, -1 -> O wins
+int rec(vector<string> &board, int turn)
+{
+  int w = winner(board);
+  if (w >= 0)
+  {
+    if (w == turn) return 1;
+    return -1;
+  }
+  if (w == -2) return 0;
+
+  int ans = -1;
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      if (board[i][j] == '_')
+      {
+        if (turn)
+        {
+          board[i][j] = 'X';
+          int val = rec(board, turn ^ 1);
+          if (val == -1)
+          {
+            if (row > i) row = i, col = j;
+            else if (row == i) col = min(col, j);
+            return 1;
+          }
+          if (val == 0)
+          {
+            ans = max(ans, 0);
+            if (row > i) row = i, col = j;
+            else if (row == i) col = min(col, j);
+          }
+          board[i][j] = '_';
+        }
+        else
+        {
+          board[i][j] = 'O';
+          int val = rec(board, turn ^ 1);
+          if (val == -1) return 1;
+          if (val == 0) ans = max(ans, 0);
+          board[i][j] = '_';
+        }
+      }
+    }
+  }
+  return ans;
+}
+
+vector<int> tictactoeWinner(vector<string> &board)
+{
+  // it's assumed that it's always our turn first
+  row = 4; col = 4;
+  vector<string> mat = board;
+  int win = rec(board, 1);
+  if (win == -1)
+  {
+    // if i am losing, just fill the first empty space
+    for (int i = 0; i < 3; i++)
+    {
+      for (int j = 0; j < 3; j++)
+      {
+        if (mat[i][j] == '_')
+        {
+          row = i;
+          col = j;
+          return {-1, row + 1, col + 1};
+        }
+      }
+    }
+  }
+  return {win, row + 1, col + 1};
+}
+
+void solve()
+{
+  vector<string> a(3);
+  cin >> a[0] >> a[1] >> a[2];
+  auto v = tictactoeWinner(a);
+  cout << v[0] << ' ' << v[1] << ' ' << v[2] << endl;
+}
+
+int main()
+{
+  solve();
+}
