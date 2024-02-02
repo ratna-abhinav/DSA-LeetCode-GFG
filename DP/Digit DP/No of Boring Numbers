@@ -1,0 +1,55 @@
+// Given L and R. Count the number of integers in [L,R] such that the number has odd digits at 1 index and even digits at even index
+// Ex: 1674 is a boring number because 1, 7 are odd digits placed at odd index and 6, 4 are even digits placed at even index
+
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+int n;
+string L, R;
+int rec (int i, int tlo, int thi, int j)
+{
+  if (i==n) return 1;
+
+  int loLim=0, hiLim=9;
+  if (tlo) loLim = L[i]-'0';
+  if (thi) hiLim = R[i]-'0';
+
+  int ans = 0;
+  for (int d=loLim; d<=hiLim; d++)
+  {
+    int nlo = tlo, nhi = thi;
+    if (d != loLim) nlo = 0;
+    if (d != hiLim) nhi = 0;
+    if (j == -1)
+    {
+      if (d == 0) ans += rec(i+1, nlo, nhi, j);
+      else
+      {
+        if (d%2) ans += rec(i+1, nlo, nhi, i);
+      }
+    }
+    else
+    {
+      int parity = (i-j+1)%2;
+      if (parity == d%2) ans += rec(i+1, nlo, nhi, j);
+    }
+  }
+  return ans;
+}
+
+
+void solve()
+{
+  cin >> L >> R;
+  int ans = 0;
+  int ext = R.size() - L.size();
+  L = string(ext, '0') + L;
+  n = R.size();
+  cout << rec(0,1,1,-1);
+}
+
+int main()
+{
+  solve();
+}
