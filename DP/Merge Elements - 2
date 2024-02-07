@@ -1,0 +1,51 @@
+// T.C = O(N^5)
+
+#include<bits/stdc++.h>
+using namespace std;
+
+int n,x,y,z;
+int arr[51];
+bool done[51][51];
+int memo[51][51][51];
+
+int dp(int l,int r,int xx){
+    if(l==r){
+        if(arr[l]==xx)return 0;
+        else return 1e9;
+    }
+    if(done[l][r]){
+        return memo[l][r][xx];
+    }
+    
+    // for a single [l,r], we'll compute values of memo[l][r][xx] for all possible values of xx
+    for(int i=0;i<50;i++) memo[l][r][i]=1e9;    
+
+    for(int mid=l;mid<r;mid++){
+        for(int fs=0;fs<50;fs++){
+            for(int ls=0;ls<50;ls++){
+                memo[l][r][(fs*x+ls*y+z)%50] = min(memo[l][r][(fs*x+ls*y+z)%50], dp(l,mid,fs)+ dp(mid+1,r,ls) + fs*ls);
+            }
+        }
+    }
+    done[l][r]=1;
+    return memo[l][r][xx];
+}
+
+void solve(){
+    memset(memo,-1,sizeof(memo));
+    cin>>n>>x>>y>>z;
+    for(int i=0;i<n;i++){
+        cin>>arr[i];
+    }
+    int ans = 1e9;
+    for(int i=0;i<50;i++){
+        ans=min(ans,dp(0,n-1,i));
+    }
+    cout<<ans<<endl;
+}   
+
+signed main(){
+    ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0);
+    //int _t;cin>>_t;while(_t--)
+    solve();
+}
