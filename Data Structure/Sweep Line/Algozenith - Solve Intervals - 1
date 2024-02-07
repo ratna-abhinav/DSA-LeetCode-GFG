@@ -1,0 +1,124 @@
+**Description**
+You are given a list of N intervals. The i-th interval is [li, ri), which denotes a range of numbers greater than or equal to li and strictly less than ri. 
+Find the minimum integer x such that you can select x intervals from the given N intervals so that the union of the selected intervals is [0, L).
+
+**Input Format**
+The first line contains two integers N (1 ≤ N ≤ 2×1e5) and L (1 ≤ L ≤ 1e12), where N is the number of intervals and L is the length of the range to be covered, respectively. 
+The i-th of the following N lines contains two integers li and ri (0 ≤ li < ri ≤ L), representing the range of the i-th interval [li, ri). 
+You can assume that the union of all the N intervals is [0, L).
+
+
+Solution:
+
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define int long long
+int _t;
+void solve();
+
+void IO()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+}
+
+void testcase(int _t)
+{
+	cin >> _t;
+	while (_t--) solve();
+}
+
+typedef long long ll;
+typedef long double lld;
+
+#define ff first
+#define ss second
+#define pi pair<int, int>
+#define vi vector<int>
+#define vs vector<string>
+#define vc vector<char>
+#define pv pair<vi, vi>
+#define vpi vector<pi>
+#define vvi vector<vi>
+#define vvc vector<vc>
+#define vvvi vector<vvi>
+#define vvvvi vector<vvvi>
+#define vvpi vector<vpi>
+#define vvvpi vector<vvpi>
+#define pb push_back
+#define mp make_pair
+#define var(k) vector<array<int, k>>
+#define all(v) v.begin(), v.end()
+#define unq(v) v.erase(unique(all(v)), v.end());
+#define len(v) (int)v.size()
+#define rep(i, a, b) for(int i=a; i<b; i++)
+#define each(nb, x) for (auto &nb:x)
+#define pll pair<ll, ll>
+#define vll vector<ll>
+#define vpll vector<pll>
+#define vvll vector<vll>
+#define setbits(x) __builtin_popcountll(x)
+#define nl '\n'
+
+int n, m;
+const int inf = 1e18;
+
+void solve()
+{
+	int l; cin >> n >> l;
+	var(3) arr;
+	rep(i,0,n)
+	{
+		int l,r; cin >> l >> r;
+		arr.pb({l,0,r});
+		arr.pb({r,1,0});
+	}
+	sort(all(arr));
+	n = len(arr);
+
+	if (arr[n-1][0] == 0) {cout << 1 << nl; return;}
+
+	int covered = 0, ans = 0, f = 0;
+	multiset<int> ms;
+	rep(i,0,n)
+	{
+		if (arr[i][0] == 0)
+		{
+			ms.insert(arr[i][2]);
+			continue;
+		}
+		if (!f)
+		{
+			ans++;
+			covered = *ms.rbegin();
+			f = 1;
+		}
+		if (arr[i][1]==0)
+		{
+			// start of interval			
+			ms.insert(arr[i][2]);
+		}
+		else
+		{
+			ms.erase(ms.find(arr[i][0]));
+			if (covered != l and covered == arr[i][0])
+			{
+				// must take some interval
+				covered = *ms.rbegin();
+				ans++;
+			}
+		}
+	}
+	assert(covered >= l);
+	cout << ans << nl;
+}
+
+signed main()
+{
+	IO();
+	solve();
+}
