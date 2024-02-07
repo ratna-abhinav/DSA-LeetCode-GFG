@@ -1,0 +1,117 @@
+Find the number of binary strings of length n where “0100” is not present as a substring.
+
+Constraints:
+1 ≤ t ≤ 1e6
+1 ≤ n ≤ 1e6 where n is the length of the string.
+
+Solution:
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#define int long long
+int _t;
+void solve();
+
+void IO()
+{
+	ios_base::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
+
+	// #ifndef ONLINE_JUDGE
+	//     freopen("input.txt", "r", stdin);
+	//     freopen("output.txt", "w", stdout);
+	//     freopen("Error.txt", "w", stderr);
+	// #endif
+}
+
+void testcase(int _t)
+{
+	cin >> _t;
+	while (_t--)
+		solve();
+}
+
+typedef long long ll;
+typedef long double lld;
+
+#define ff first
+#define ss second
+#define pi pair<int, int>
+#define vi vector<int>
+#define vs vector<string>
+#define vc vector<char>
+#define pv pair<vi, vi>
+#define vpi vector<pi>
+#define vvi vector<vi>
+#define vvc vector<vc>
+#define vvvi vector<vvi>
+#define vvvvi vector<vvvi>
+#define vvpi vector<vpi>
+#define vvvpi vector<vvpi>
+#define pb push_back
+#define mp make_pair
+#define var(k) vector<array<int, k>>
+#define all(v) v.begin(), v.end()
+#define unq(v) v.erase(unique(all(v)), v.end());
+#define len(v) (int)v.size()
+#define rep(i, a, b) for (int i = a; i < b; i++)
+#define each(nb, x) for (auto &nb : x)
+#define pll pair<ll, ll>
+#define vll vector<ll>
+#define vpll vector<pll>
+#define vvll vector<vll>
+#define setbits(x) __builtin_popcountll(x)
+#define nl '\n'
+
+int n, m;
+const int inf = 1e18, MOD = 1e9 + 7;
+int dp[1000005][8];
+
+/*
+	formulate DP in such a way that it can be cached across queries
+*/
+
+// no of binary strings of length i
+int rec(int i, int last3)
+{
+	// basecase
+	if (i == 0)
+		return 1;
+	if (dp[i][last3] != -1)
+		return dp[i][last3];
+
+	int ans = 0;
+	// place '0'
+	if (last3 != 4)
+		ans = (ans + rec(i - 1, (last3 >> 1))) % MOD;
+
+	// place '1'
+	int cur = (last3 | 8);
+	if (cur != 4)
+		ans = (ans + rec(i - 1, (last3 >> 1) | 4)) % MOD;
+	return dp[i][last3] = ans;
+}
+
+void solve()
+{
+	cin >> n;
+	if (n < 4)
+		cout << (1 << n) << nl;
+	else
+	{
+		int ans = 0;
+		rep(last3, 0, 8) ans = (ans + rec(n - 3, last3)) % MOD;
+		cout << ans << nl;
+	}
+}
+
+signed main()
+{
+	IO();
+	memset(dp, -1, sizeof dp);
+
+	testcase(_t);
+	// solve();
+}
