@@ -1,0 +1,136 @@
+Given two arrays A of size N and B of size M and an integer K. Create a new array C of size N*M consisting of A[i]+B[j] for all 1<=i<=N
+and 1<=j<=M. Find the Kth smallest sum in the array C.
+
+Constraints:
+1 <= N, M <= 1e6
+1 <= K <= N*M
+1 <= A[i], B[i] <= 1e4
+
+
+                                                          SOLUTION 1: O(N * log N)
+
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define len(v) (int)(v.size())
+#define nl '\n'
+#define all(v) v.begin(), v.end()
+
+int n, m;
+ll k;
+vi a, b;
+
+bool ok(int x)
+{
+	// we need to count how many elements of c[] will be <= x
+	ll cnt = 0;
+	int j = 0;
+	for (int i=0; i<n; i++)
+	{
+		if (i==0)
+		{
+			while (j<m and a[i]+b[j] <= x) j++;
+			if (j==0) break;
+			cnt += j;
+			j--;	// last valid index for i=0
+		}
+		else
+		{
+			if (a[i]+b[0] > x) break;
+			while (j>=0 and a[i]+b[j] > x) j--;
+			cnt += (j + 1);
+		}
+	}
+	return cnt >= k;
+}
+
+void solve()
+{
+	cin >> n >> m >> k; a.assign(n,0); b.assign(m,0);
+	rep(i,0,n) cin >> a[i];
+	rep(i,0,m) cin >> b[i];
+	sort(all(a)); sort(all(b));
+
+	int lo = 0, hi = 1e5;
+	while (lo <= hi)
+	{
+		int mid = (lo+hi)/2;
+		if (ok(mid)) hi = mid-1;
+		else lo = mid+1;
+	}
+	cout << hi+1 << nl;
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
+
+
+                                                        SOLUTION 2: O(N * log N * log N)
+
+
+#include <bits/stdc++.h>
+using namespace std;
+typedef pair<int, int> Pair;
+typedef long long ll;
+vector<int> a, b;
+#define int long long
+signed main()
+{
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+    int t;
+    cin >> t;
+    while (t--)
+    {
+        int n, m, k;
+        cin >> n >> m >> k;
+        a.resize(n);
+        b.resize(m);
+        for (int i = 0; i < n; i++)
+        {
+            cin >> a[i];
+        }
+        for (int i = 0; i < m; i++)
+        {
+            cin >> b[i];
+        }
+        if (n > m)
+        {
+            swap(n, m);
+            swap(a, b);
+        }
+        sort(a.begin(), a.end());
+        sort(b.begin(), b.end());
+        int l = a[0] + b[0];
+        int h = a[n - 1] + b[m - 1];
+        int ans = l;
+        while (l <= h)
+        {
+            int mid = (l + h) / 2;
+            int ne = 0;
+            for (int i = 0; i < n; i++)
+            {
+                ne += upper_bound(b.begin(), b.end(), mid - a[i]) - b.begin();
+            }
+            if (ne >= k)
+            {
+                ans = mid;
+                h = mid - 1;
+            }
+            else
+                l = mid + 1;
+        }
+        cout << ans << '\n';
+    }
+    return 0;
+}
