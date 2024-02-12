@@ -1,0 +1,81 @@
+You are given two integers N and S. Find the number of positive integers X less than equal to N, such that the difference between X and the sum of its digits 
+(in decimal representation) is not less than S.
+
+1 <= N, S <= 1e18
+
+Sample Input:
+10
+5 4
+100 5
+20 3
+40 19
+32 15
+69 12
+1000000000000000 0
+1000000000000000000 10000000
+9999999999999 9999999999882
+13465751690089037 981448507916936
+
+Sample Output:
+0
+91
+11
+11
+13
+50
+1000000000000000
+999999999989999991
+10
+12484303182172038
+
+Solution:
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define int long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define len(v) (int)(v.size())
+#define nl '\n'
+
+int digitSum(int n)
+{
+	int ans = 0;
+	while (n)
+	{
+		ans += n%10;
+		n /= 10;
+	}
+	return ans;
+}
+
+void solve()
+{
+	int n, s; cin >> n >> s;
+
+	// n - sum(digits) >= s
+	if (n < s) cout << 0 << nl;
+	else
+	{
+		// we'll find the smallest number valid number, coz after that every number will be a valid number 
+		int lo = 1, hi = n;
+		while (lo <= hi)
+		{
+			int mid = (lo+hi)/2;
+			int sum = digitSum(mid);
+			if (mid - sum >= s) hi = mid-1;
+			else lo = mid+1;
+		}
+		int smallestValidNumber = hi+1;
+		cout << n - smallestValidNumber + 1 << nl;
+	}
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
