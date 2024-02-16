@@ -1,0 +1,194 @@
+Given a string S, find the longest string T such that:
+→ T is the prefix of S.
+→ T is the suffix of S.
+→ T is present in the middle of S, such that T is not a prefix and suffix.
+
+Suppose S = “aaaa”, then T = “aa”.
+aa is a prefix, S[0..1].
+aa is a suffix S[2..3].
+aa is present in the middle and it is not a prefix or suffix, S[1..2].
+
+If no T exists then print -1.
+
+
+HASHING SOLUTION:
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define len(v) (int)(v.size())
+#define nl '\n'
+
+struct Hash
+{
+	int sz, MOD, BASE;
+	vector<int> fwdHash, revHash, pp;
+	void init(string &s, int base, int mod)
+	{
+		BASE = base; MOD = mod; sz = s.size();
+		fwdHash.assign(sz,0); revHash.assign(sz,0); pp.assign(sz,0);
+		fwdHash[0] = s[0]+1; pp[0] = 1; revHash[sz-1] = s[sz-1] + 1;
+		for (int i=1; i<sz; i++)
+		{
+			fwdHash[i] = (1ll * fwdHash[i-1] * BASE + s[i] + 1) % MOD;
+			pp[i] = (1ll * pp[i-1] * BASE) % MOD;
+			revHash[sz-1-i] = (1ll * revHash[sz-i] * BASE + s[sz-1-i] + 1) % MOD;
+		}
+	}
+	int forwardHash(int l, int r)
+	{
+		if (l>r) return 0;
+		if (l==0) return fwdHash[r];
+		int ans = (0ll + (0ll + fwdHash[r] - 1ll * fwdHash[l-1] * pp[r-l+1]) % MOD + MOD) % MOD;
+		return ans;
+	}
+	int reverseHash(int l, int r)
+	{
+		if (l>r) return 0;
+		if (r==sz-1) return revHash[l];
+		int ans = (0ll + (0ll + revHash[l] - 1ll * revHash[r+1] * pp[r-l+1]) % MOD + MOD) % MOD;
+		return ans;
+	}
+};
+
+int quickHash(string &s, int BASE, int MOD)
+{
+	int ans = s[0]+1, sz = s.size();
+	for (int i=1; i<sz; i++) ans = (1ll * ans * BASE + s[i] + 1) % MOD;
+	return ans;
+}
+
+struct doubleHash
+{
+	Hash h1, h2;
+	void init(string &s, int base1, int base2, int mod1, int mod2)
+	{
+		h1.init(s, base1, mod1);
+		h2.init(s, base2, mod2);
+	}
+	pair<int,int> forwardHash(int l, int r)
+	{
+		pair<int,int> ans = {h1.forwardHash(l, r), h2.forwardHash(l, r)};
+		return ans;
+	}
+	pair<int,int> reverseHash(int l, int r)
+	{
+		pair<int,int> ans = {h1.reverseHash(l, r), h2.reverseHash(l, r)};
+		return ans;
+	}
+};
+
+
+vector<int> KMP(string &s)
+{
+	int sz = s.size();
+	vector<int> kmp(sz+1, -1);	// kmp[i]: kmp value of index i-1
+	int i = 0, j = -1;
+	while (i < sz)
+	{
+		while (j != -1 and s[i] != s[j]) j = kmp[j];
+		j++; i++;
+		kmp[i] = j;
+	}
+	return kmp;
+}
+
+
+void solve()
+{
+	int n; string s; cin >> n >> s;
+	doubleHash dh;
+	dh.init(s, 31, 37, 1e9+7, 1e9+9);
+
+	vi kmp = KMP(s);
+	map<int,int> have;
+	rep(i,1,n+1) have[kmp[i]]++;
+
+	int ans = -1;
+	rep(i,0,n)
+	{
+		// prefix => [0, i]
+		// check whether prefix of length i matches suffix of length i
+		auto h1 = dh.forwardHash(0, i);
+		auto h2 = dh.forwardHash(n-i-1, n-1);
+		if (h1 == h2)	// prefix and suffix matches
+		{
+			// need to check whether there exists any subarray with kmp value as i+1
+			if (kmp[n] == i+1 and have[i+1] > 1) ans = i+1;
+			else if (kmp[n] != i+1 and have.count(i+1)) ans = i+1;
+		}
+	}
+	if (ans == -1) cout << "-1\n";
+	else cout << s.substr(0, ans) << nl;
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
+
+
+
+
+
+
+KMP SOLUTION:
+
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define len(v) (int)(v.size())
+#define nl '\n'
+
+vector<int> KMP(string &s)
+{
+	int sz = s.size();
+	vector<int> kmp(sz+1, -1);	// kmp[i]: kmp value of index i-1
+	int i = 0, j = -1;
+	while (i < sz)
+	{
+		while (j != -1 and s[i] != s[j]) j = kmp[j];
+		j++; i++;
+		kmp[i] = j;
+	}
+	return kmp;
+}
+
+void solve()
+{
+	int n; string s; cin >> n >> s;
+	vi kmp = KMP(s);
+
+	if (kmp[n] == 0) {cout << -1 << nl; return;}
+	
+	// check if answer is kmp[n]
+	rep(i,1,n-1)
+	{
+		if (kmp[i+1] == kmp[n])
+		{
+			cout << s.substr(0, kmp[n]) << nl;
+			return;
+		}
+	}
+
+	if (kmp[kmp[n]] == 0) cout << -1 << nl;
+	else cout << s.substr(0, kmp[kmp[n]]) << nl;
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
