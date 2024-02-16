@@ -1,0 +1,68 @@
+Given are two sequences a = {a[0].....a[N−1]} and b = {b[0]....b[N-1}} of N non-negative integers each.
+You will choose an integer k such that 0 ≤ k < N and an integer x not less than 0, to make a new sequence C[] of length N, as follows:
+
+C[i] = a[(i+k) % N] XOR x  for i = {0,1...N-1}
+
+Find all pairs (k,x) such that C will be equal to b.
+
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define len(v) (int)(v.size())
+#define nl '\n'
+
+vector<int> KMP(vi &s)
+{
+	int sz = s.size();
+	vector<int> kmp(sz+1, -1);	// kmp[i]: kmp value of index i-1
+	int i = 0, j = -1;
+	while (i < sz)
+	{
+		while (j != -1 and s[i] != s[j]) j = kmp[j];
+		j++; i++;
+		kmp[i] = j;
+	}
+	return kmp;
+}
+
+void solve()
+{
+	int n; cin >> n;
+	vi a(n), b(n);
+	rep(i,0,n) cin >> a[i];
+	rep(i,0,n) cin >> b[i];
+
+	vvi ans;
+	vi c(n), d(n);
+	rep(i,0,n) c[i] = (a[i] ^ a[(i+1)%n]);
+	rep(i,0,n) d[i] = (b[i] ^ b[(i+1)%n]);
+
+	vi arr = d;
+	arr.push_back(-1);
+	rep(i,0,n) arr.push_back(c[i]);
+	rep(i,0,n) arr.push_back(c[i]);
+	vi kmp = KMP(arr);
+
+	rep(i,2*n, 3*n)
+	{
+		if (kmp[i+1] == n)	// remember that kmp[] is shifted to right by 1 or 1-based indexed (in easier terms)
+		{
+			int k = i - 2*n;
+			int x = a[k] ^ b[0];
+			ans.push_back({k, x});
+		}
+	}
+	for (auto v:ans) cout << v[0] << ' ' << v[1] << nl;
+}
+
+signed main()
+{
+	// int t; cin >> t; while (t--)
+	solve();
+}
