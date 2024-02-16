@@ -1,0 +1,88 @@
+Given a string s, find the lexicographic sorted order of all of its N cyclic shifts.
+
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define len(v) (int)(v.size())
+#define nl '\n'
+
+string s;
+int n;
+
+struct Hash
+{
+	int sz, MOD, BASE;
+	vector<int> fwdHash, revHash, pp;
+	void init(string &s, int base, int mod)
+	{
+		BASE = base; MOD = mod; sz = s.size();
+		fwdHash.assign(sz,0); revHash.assign(sz,0); pp.assign(sz,0);
+		fwdHash[0] = s[0]+1; pp[0] = 1; revHash[sz-1] = s[sz-1] + 1;
+		for (int i=1; i<sz; i++)
+		{
+			fwdHash[i] = (1ll * fwdHash[i-1] * BASE + s[i] + 1) % MOD;
+			pp[i] = (1ll * pp[i-1] * BASE) % MOD;
+			revHash[sz-1-i] = (1ll * revHash[sz-i] * BASE + s[sz-1-i] + 1) % MOD;
+		}
+	}
+	int forwardHash(int l, int r)
+	{
+		if (l>r) return 0;
+		if (l==0) return fwdHash[r];
+		int ans = ((0ll + fwdHash[r] - 1ll * fwdHash[l-1] * pp[r-l+1]) % MOD + MOD) % MOD;
+		return ans;
+	}
+	int reverseHash(int l, int r)
+	{
+		if (l>r) return 0;
+		if (r==sz-1) return revHash[l];
+		int ans = ((0ll + revHash[l] - 1ll * revHash[r+1] * pp[r-l+1]) % MOD + MOD) % MOD;
+		return ans;
+	}
+};
+
+Hash h;
+
+bool comp(int i, int j)
+{
+	// s[i..] = s[j...]
+	if (h.forwardHash(i, i+n-1) == h.forwardHash(j, j+n-1)) return i < j;
+
+	// binary search over length of longest common substring
+	int lo = 1, hi = n-1;
+	while (lo <= hi)
+	{
+		int mid = (lo+hi)/2;
+		if (h.forwardHash(i, i+mid-1) == h.forwardHash(j, j+mid-1))
+			lo = mid + 1;
+		else hi = mid - 1;
+	}
+	int lcs = lo-1;
+	return s[i+lcs] < s[j+lcs];
+}
+
+// T.C = O (n * log n * log n)
+
+void solve()
+{
+	cin >> n >> s;
+	s += s;
+	h.init(s, 31, 1e9+7);
+
+	vi ans(n);
+	rep(i,0,n) ans[i] = i;
+	sort(ans.begin(), ans.end(), comp);
+	rep(i,0,n) cout << ans[i] << ' ';
+}
+
+signed main()
+{
+	// int t; cin >> t; while (t--)
+	solve();
+}
