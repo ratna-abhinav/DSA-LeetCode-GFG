@@ -1,0 +1,121 @@
+You are given a tree with N nodes. Initially, all the nodes' value is 0. You have to perform Q queries - 3 space-separated integers x, y, z.
+Add z to all the nodes on the shortest path from x to y.
+After performing all the queries print the final value of nodes 1,2,….n.
+
+
+
+							                                          /*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define int long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define pi pair<int,int>
+#define len(v) (int)(v.size())
+#define all(v) v.begin(), v.end()
+#define nl '\n'
+
+int n;
+const int LN = 20;
+vvi dp;
+vi level, pf;
+
+// need to precompute dp[][]
+int kth_parent(int node, int k)
+{
+	while (k > 0)
+	{
+		int bit = 31 - __builtin_clz(k);
+		node = dp[node][bit];
+		if (node == -1) return -1;
+		k -= (1<<bit);
+	}
+	return node;
+}
+
+int find_lca(int u, int v)
+{
+	if (level[u] > level[v]) swap(u, v);
+	int d = level[v] - level[u];
+	v = kth_parent(v, d);
+	if (u == v) return u;
+
+	for (int i=LN-1; i>=0; i--)
+	{
+		if (dp[u][i] != dp[v][i])
+		{
+			u = dp[u][i];
+			v = dp[v][i];
+		}
+	}
+	return dp[u][0];
+}
+
+void dfs (int cur, int par, vi tree[])
+{
+	dp[cur][0] = par;
+	level[cur] = level[par] + 1;
+	rep(i,1,LN)
+	{
+		int v = dp[cur][i-1];
+		dp[cur][i] = dp[v][i-1];
+	}
+	for (auto nb:tree[cur])
+	{
+		if (nb==par) continue;
+		dfs(nb, cur, tree);
+	}
+}
+
+
+void add(int x, int y, int z)
+{
+	pf[x] += z;
+	pf[y] += z;
+	int lca = find_lca(x,y);
+	pf[lca] -= z;
+	pf[dp[lca][0]] -= z;
+}
+
+// push the values of nodes to their parent
+void dfs_push(int cur, int par, vi tree[])
+{
+	for (auto nb:tree[cur])
+	{
+		if (nb == par) continue;
+		dfs_push(nb, cur, tree);
+	}
+	pf[par] += pf[cur];
+}
+
+void solve()
+{
+	cin >> n;
+	vi tree[n+1];
+	rep(i,1,n)
+	{
+		int u,v; cin >> u >> v;
+		tree[u].push_back(v);
+		tree[v].push_back(u);
+	}
+	pf.assign(n+1, 0); level.assign(n+1, 0);
+	dp.assign(n+1, vi(LN, 0));
+	dfs(1,0,tree);
+
+	int q; cin >> q;
+	while (q--)
+	{
+		int x,y,z; cin >> x >> y >> z;
+		add(x,y,z);
+	}
+	dfs_push(1,0,tree);
+	rep(i,1,n+1) cout << pf[i] << ' '; cout << nl;
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
