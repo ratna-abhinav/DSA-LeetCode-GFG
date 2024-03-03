@@ -1,0 +1,115 @@
+Given a tree of N nodes and Q queries. Tree is weighted i.e., edges have weights.
+In every query u will be given {u,v}, find sum of edges that lie on the path from node u to node v.
+
+
+T.C = O (n * logN)  ->  Overkill Approach
+
+
+							                            /*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define pi pair<int,int>
+#define len(v) (int)(v.size())
+#define all(v) v.begin(), v.end()
+#define nl '\n'
+
+int n;
+const int LN = 20;
+vvi dp, sum;
+vi level, vals;
+
+// need to precompute dp[][]
+int kth_parent(int node, int k, int &ans)
+{
+	while (k > 0)
+	{
+		int bit = 31 - __builtin_clz(k);
+		ans += sum[node][bit];
+		node = dp[node][bit];
+		if (node == -1) return -1;
+		k -= (1<<bit);
+	}
+	return node;
+}
+
+int query(int u, int v)
+{
+	int ans = 0;
+	if (level[u] > level[v]) swap(u, v);
+	int d = level[v] - level[u];
+	v = kth_parent(v, d, ans);
+	if (u == v) 
+	{
+		return ans;
+	}
+
+	for (int i=LN-1; i>=0; i--)
+	{
+		if (dp[u][i] != dp[v][i])
+		{
+			ans += sum[u][i];
+			u = dp[u][i];
+			ans += sum[v][i];
+			v = dp[v][i];
+		}
+	}
+	ans += vals[u] + vals[v];
+	return ans;
+}
+
+void dfs (int cur, int par, int wt, vector<pi> tree[])
+{
+	dp[cur][0] = par;
+	level[cur] = level[par] + 1;
+	vals[cur] = wt;
+	sum[cur][0] = vals[cur];
+	for (auto [nb, w] : tree[cur])
+	{
+		if (nb == par) continue;
+		dfs (nb, cur, w, tree);
+	}
+}
+
+void solve()
+{
+	cin >> n;
+	dp.assign(n+1, vi(LN, 0)); sum.assign(n+1, vi(LN, 0));
+	level.assign(n+1, 0); vals.assign(n+1, 0);
+
+	vector<pi> tree[n+1];
+	rep(i,0,n-1)
+	{
+		int u,v,w; cin >> u >> v >> w;
+		tree[u].push_back({v,w});
+		tree[v].push_back({u,w});
+	}
+	dfs(1, 0, 0, tree);
+
+	rep(l,1,LN)
+	{
+		rep(i,1,n+1)
+		{
+			int v = dp[i][l-1];
+			dp[i][l] = dp[v][l-1];
+			sum[i][l] = sum[i][l-1] + sum[v][l-1];
+		}
+	}
+
+	int q; cin >> q;
+	while (q--)
+	{
+		int x,y; cin >> x >> y;
+		cout << query(x,y) << nl;
+	}
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
