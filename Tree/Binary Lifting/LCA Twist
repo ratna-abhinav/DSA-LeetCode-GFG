@@ -1,0 +1,117 @@
+Given a tree of N nodes and Q queries. In every query, you will be given {x,y,z} and u need to tell LCA(x,y) if z is the root of the tree.
+
+Constriants:
+1 <= N, Q <= 1e5
+1 <= x,y,z <= N
+
+
+
+                                      /*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define pi pair<int,int>
+#define len(v) (int)(v.size())
+#define all(v) v.begin(), v.end()
+#define nl '\n'
+
+int n;
+const int LN = 20;
+vvi dp;
+vi level;
+
+// need to precompute dp[][]
+int kth_parent(int node, int k)
+{
+	while (k > 0)
+	{
+		int bit = 31 - __builtin_clz(k);
+		node = dp[node][bit];
+		if (node == -1) return -1;
+		k -= (1<<bit);
+	}
+	return node;
+}
+
+int find_lca(int u, int v)
+{
+	if (level[u] > level[v]) swap(u, v);
+	int d = level[v] - level[u];
+	v = kth_parent(v, d);
+	if (u == v) return u;
+
+	for (int i=LN-1; i>=0; i--)
+	{
+		if (dp[u][i] != dp[v][i])
+		{
+			u = dp[u][i];
+			v = dp[v][i];
+		}
+	}
+	return dp[u][0];
+}
+
+void dfs (int cur, int par, vi tree[])
+{
+	dp[cur][0] = par;
+	level[cur] = level[par] + 1;
+	for (auto nb : tree[cur])
+	{
+		if (nb == par) continue;
+		dfs (nb, cur, tree);
+	}
+}
+
+void solve()
+{
+	cin >> n;
+	dp.assign(n+1, vi(LN, 0));
+	level.assign(n+1, 0);
+	vi tree[n+1];
+	rep(i,0,n-1)
+	{
+		int u,v; cin >> u >> v;
+		tree[u].push_back(v);
+		tree[v].push_back(u);
+	}
+	dfs(1, 0, tree);
+
+	rep(l,1,LN)
+	{
+		rep(i,1,n+1)
+		{
+			dp[i][l] = dp[dp[i][l-1]][l-1];
+		}
+	}
+
+	int q; cin >> q;
+	while (q--)
+	{
+		int x,y,z; cin >> x >> y >> z;
+		int l = find_lca(x, y);
+		int u = find_lca(x, z);
+		int v = find_lca(y, z);
+		if (u == l)
+		{
+			cout << v << nl;
+		}
+		else if (v == l)
+		{
+			cout << u << nl;
+		}
+		else
+		{
+			cout << l << nl;
+		}
+	}
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
