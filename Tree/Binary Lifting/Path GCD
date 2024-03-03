@@ -1,0 +1,114 @@
+Given a tree of N nodes and Q queries. In each query u'll be given {x,y}. Find gcd of nodes lying on the path from node a to node b.
+
+T.C = O (n * logN * logN)
+
+							/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define pi pair<int,int>
+#define len(v) (int)(v.size())
+#define all(v) v.begin(), v.end()
+#define nl '\n'
+
+int n;
+const int LN = 20;
+vvi dp, GCD;
+vi level, vals;
+
+// need to precompute dp[][]
+int kth_parent(int node, int k, int &ans)
+{
+	while (k > 0)
+	{
+		int bit = 31 - __builtin_clz(k);
+		ans = __gcd(ans, GCD[node][bit]);
+		node = dp[node][bit];
+		if (node == -1) return -1;
+		k -= (1<<bit);
+	}
+	return node;
+}
+
+int query(int u, int v)
+{
+	int ans = 0;
+	if (level[u] > level[v]) swap(u, v);
+	int d = level[v] - level[u];
+	v = kth_parent(v, d, ans);
+	if (u == v) 
+	{
+		ans = __gcd(ans, vals[u]);
+		return ans;
+	}
+
+	for (int i=LN-1; i>=0; i--)
+	{
+		if (dp[u][i] != dp[v][i])
+		{
+			ans = __gcd(ans, GCD[u][i]);
+			u = dp[u][i];
+			ans = __gcd(ans, GCD[v][i]);
+			v = dp[v][i];
+		}
+	}
+	ans = __gcd(ans, __gcd(vals[u], vals[v]));
+	ans = __gcd(ans, vals[dp[u][0]]);
+	return ans;
+}
+
+void dfs (int cur, int par, vi tree[])
+{
+	dp[cur][0] = par;
+	level[cur] = level[par] + 1;
+	GCD[cur][0] = vals[cur];
+	for (auto nb : tree[cur])
+	{
+		if (nb == par) continue;
+		dfs (nb, cur, tree);
+	}
+}
+
+void solve()
+{
+	cin >> n;
+	dp.assign(n+1, vi(LN, 0)); GCD.assign(n+1, vi(LN, 0));
+	level.assign(n+1, 0); vals.assign(n+1, 0);
+	rep(i,1,n+1) cin >> vals[i];
+
+	vi tree[n+1];
+	rep(i,0,n-1)
+	{
+		int u,v; cin >> u >> v;
+		tree[u].push_back(v);
+		tree[v].push_back(u);
+	}
+	dfs(1, 0, tree);
+
+	rep(l,1,LN)
+	{
+		rep(i,1,n+1)
+		{
+			int v = dp[i][l-1];
+			dp[i][l] = dp[v][l-1];
+			GCD[i][l] = __gcd(GCD[i][l-1], GCD[v][l-1]);
+		}
+	}
+
+	int q; cin >> q;
+	while (q--)
+	{
+		int x,y; cin >> x >> y;
+		cout << query(x,y) << nl;
+	}
+}
+
+signed main()
+{
+	int t; cin >> t; while (t--)
+	solve();
+}
