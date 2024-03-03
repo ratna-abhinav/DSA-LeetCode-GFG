@@ -1,9 +1,9 @@
-Given a tree of N nodes and Q queries. Tree is weighted i.e., edges have weights.
-In every query u will be given {u,v}, find sum of edges that lie on the path from node u to node v.
+Given a tree of N nodes and Q queries. The tree is weighted i.e., edges have weights.
+In every query, you will be given {u,v}, find the sum of edges that lie on the path from node u to node v.
 
 
-T.C = O (n * logN)  ->  Overkill Approach
-
+Easy Approach - Just maintain prefix sum from root to current node, then ans = prefix[u] + prefix[v] - 2 * prefix[ lca(u,v) ]
+Overkill Approach: Use Binary Lifting to maintain path aggregates (i.e., sum)
 
 							                            /*    JAI SHRI RAM    */
 #include <bits/stdc++.h>
