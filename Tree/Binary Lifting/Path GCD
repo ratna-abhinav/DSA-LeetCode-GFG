@@ -1,4 +1,5 @@
-Given a tree of N nodes and Q queries. In each query u'll be given {x,y}. Find gcd of nodes lying on the path from node a to node b.
+Given a tree of N nodes and Q queries. You also have an arr[] of size N denoting the value stored in node i.
+In each query u'll be given {x,y}. Find gcd of nodes lying on the path from node a to node b.
 
 T.C = O (n * logN * logN)
 
