@@ -1,0 +1,57 @@
+You are given a string S consisting of lowercase characters. Some of the characters are good and the rest are bad. A substring S[l..r] is good if among the letters S[l], S[l+1] ... S[r],
+there are at most K bad ones. 
+You have to find the number of distinct good substrings of the given string S. Also count total number of good substrings as well.
+Two substrings S[l..r] and S[p..q] is distinct if their content is different S[l…r]≠S[p..q].
+Constriants:
+1 <= K <= |S| <= 3000.
+
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+const int MX = 3005*3000;
+int trie[MX][26], root = 0, node = 0, bad[26], cnt[MX], pf[MX], n;
+
+void add(int st, string &s)
+{
+	int cur = root;
+	pf[cur] = 0;
+	for (int i=st; i<n; i++)
+	{
+		int val = s[i]-'a';
+		int prev = cur;
+		if (trie[cur][val]) cur = trie[cur][val];
+		else
+		{
+			trie[cur][val] = ++node;
+			cur = trie[cur][val];
+		}
+		pf[cur] = pf[prev];
+		if (!bad[val]) pf[cur]++;
+		cnt[cur]++;
+	}
+}
+
+void solve()
+{
+	string s,t; cin >> s >> t;
+	n = s.size();
+	int k; cin >> k;
+	for(int i=0; i<26; i++) bad[i] = t[i]-'0';
+	for (int i=0; i<n; i++) add(i, s);
+	int countTotal = 0, countDistinct = 0;
+	for (int i=1; i<MX; i++) 
+	{
+		if (pf[i] <= k and cnt[i] > 0)
+		{
+			countDistinct++;
+			countTotal += cnt[i];
+		}
+	}
+	cout << countDistinct << ' ' << countTotal;
+}
+
+int main()
+{
+	solve();
+}
