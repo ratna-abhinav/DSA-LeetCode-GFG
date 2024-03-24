@@ -1,0 +1,149 @@
+Problem Statement:
+Given an array arr[] of N integers. Also you are given Q queries of following type:
+1. (1,x,v)    => replace arr[x] with v
+2. (2,l,r,k)  => count no of elements in index range [l,r] with value <= k
+
+
+Solution:
+
+/*    JAI SHRI RAM    */
+#include <bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+using namespace std;
+
+#define ll long long
+#define rep(i,a,b) for(int i=a; i<b; i++)
+#define vi vector<int>
+#define vvi vector<vi>
+#define pi pair<int,int>
+#define len(v) (int)(v.size())
+#define all(v) v.begin(), v.end()
+#define nl '\n'
+
+template <class T>
+using mul_ord_set = tree<T, null_type, less_equal<T>, rb_tree_tag,
+      tree_order_statistics_node_update>;
+
+
+vi arr;
+#define lc (x << 1)
+#define rc (x << 1) | 1
+
+int N;
+vector<mul_ord_set<int>> ST;
+
+mul_ord_set<int> merge(mul_ord_set<int> v1, mul_ord_set<int> v2)
+{
+    mul_ord_set<int> ans;
+    while (!v1.empty() and !v2.empty())
+    {
+        if ((*v1.begin()) < (*v2.begin()))
+        {
+            ans.insert(*v1.begin());
+            v1.erase(v1.begin());
+        }
+        else
+        {
+            ans.insert(*v2.begin());
+            v2.erase(v2.begin());
+        }
+    }
+    while (!v1.empty())
+    {
+        ans.insert(*v1.begin());
+        v1.erase(v1.begin());
+    }
+    while (!v2.empty())
+    {
+        ans.insert(*v2.begin());
+        v2.erase(v2.begin());
+    }
+    return ans;
+}
+
+void build(int x = 1, int l = 1, int r = N + 1)
+{
+    // Base Case
+    if (l == r - 1)
+    {
+        ST[x].insert(arr[l]);
+        return;
+    }
+    int mid = (l + r) / 2;
+    build(lc, l, mid);
+    build(rc, mid, r);
+    ST[x] = merge(ST[lc], ST[rc]);
+}
+
+// O (log^2) time
+int query(int L, int R, int val, int x = 1, int l = 1, int r = N + 1)
+{
+    // Base Case
+    if (l >= R or r <= L) return 0;
+    if (l >= L and r <= R)
+    {
+        int ans = ST[x].order_of_key(val + 1);
+        return ans;
+    }
+    int mid = (l + r) / 2;
+    int lc_val = query(L, R, val, lc, l, mid);
+    int rc_val = query(L, R, val, rc, mid, r);
+
+    int ans = lc_val + rc_val;
+    return ans;
+}
+
+// O (log^2) time
+void update(int pos, int val1, int val2, int x = 1, int l = 1, int r = N + 1)
+{
+    // no overlap
+    if (pos < l or pos >= r) return;
+    if (l == r - 1)
+    {
+        ST[x].erase(ST[x].upper_bound(val1));
+        ST[x].insert(val2);
+        return;
+    }
+    int mid = (l + r) / 2;
+    update(pos, val1, val2, lc, l, mid);
+    update(pos, val1, val2, rc, mid, r);
+    ST[x].erase(ST[x].upper_bound(val1));
+    ST[x].insert(val2);
+}
+
+void solve()
+{
+    int n, q; cin >> n >> q;
+    arr.assign(n + 1, 0);
+    rep(i, 1, n + 1) cin >> arr[i];
+    N = n; ST.clear();
+    ST.resize(4 * N);
+
+    build();
+    rep(i, 0, q)
+    {
+        int type; cin >> type;
+        if (type == 1)
+        {
+            int x, y; cin >> x >> y;
+            update(x, arr[x], y);
+            arr[x] = y;
+        }
+        else
+        {
+            int l, r, k; cin >> l >> r >> k;
+            int ans = query(l, r + 1, k);
+            cout << ans << nl;
+        }
+    }
+}
+
+signed main()
+{
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+    solve();
+}
