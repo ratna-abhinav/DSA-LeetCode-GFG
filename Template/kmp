@@ -1,0 +1,13 @@
+vector<int> KMP(string &s)
+{
+    int sz = s.size();
+    vector<int> kmp(sz+1, -1);    // kmp[i]: kmp value of index i-1
+    int i = 0, j = -1;
+    while (i < sz)
+    {
+        while (j != -1 and s[i] != s[j]) j = kmp[j];
+        j++; i++;
+        kmp[i] = j;
+    }
+    return kmp;
+}
