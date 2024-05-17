@@ -1,0 +1,89 @@
+template <class T>
+class ST
+{
+private:
+    int n, N;
+    const T O{0};    // Base Case value
+    vector<T> seg;
+    vector<array<int, 3>> lazy;        // required lazy tags
+
+public:
+    ST() {}
+    ST(int _n) : n(_n), N(4 << __lg(n - 1))
+    {
+        seg.assign(N + 2, O);
+        lazy.assign(N + 2, {0, -1, 0});
+    }
+
+    // merge answer of left and right child to get answer of current node
+    T op(T x, T y)
+    {
+        T ans = x + y;
+        return ans;
+    }
+
+    void _build(int x, int s, int e, vector<T> &arr)
+    {
+        if (s == e)
+        {
+            seg[x] = arr[s];
+            return;
+        }
+        int mid = (s + e) / 2;
+        _build(x << 1, s, mid, arr); _build(x << 1 | 1, mid + 1, e, arr);
+        seg[x] = op(seg[2 * x], seg[2 * x + 1]);
+    }
+
+    void push(int x, int s, int e)
+    {
+        if (e < s) return;
+
+        // correct the answer of node x
+        if (lazy[x][2])
+        {
+            seg[x] = (e - s + 1) * lazy[x][1];
+        }
+        // propagte and combine the lazy to the children of x
+        if (s != e)
+        {
+            if (lazy[x][2])
+            {
+                lazy[x << 1] = lazy[x << 1 | 1] = lazy[x];
+            }
+            else
+            {
+                lazy[x << 1][0] ^= lazy[x][0], lazy[x << 1 | 1][0] ^= lazy[x][0];
+            }
+        }
+        // unmark the lazy
+        lazy[x] = {0, 0, 0};
+    }
+
+    void _update(int x, int s, int e, int l, int r, int u)
+    {
+        if (e < s or s > r or e < l) return;
+        push(x, s, e);
+        if (l <= s and r >= e)
+        {
+            lazy[x] = {0, u, 1};
+            return;
+        }
+        int m = (s + e) >> 1;
+        _update(x << 1, s, m, l, r, u); _update(x << 1 | 1, m + 1, e, l, r, u);
+        push(x << 1, s, m), push(x << 1 | 1, m + 1, e);
+        seg[x] = op(seg[x << 1], seg[x << 1 | 1]);
+    }
+
+    T _query(int x, int s, int e, int l, int r)
+    {
+        if (l > e or r < s or s > e) return O;
+        push(x, s, e);
+        if (l <= s and r >= e) return seg[x];
+        int m = (s + e) >> 1;
+        return op(_query(x << 1, s, m, l, r), _query(x << 1 | 1, m + 1, e, l, r));
+    }
+
+    T query(int l, int r) { return l > r ? O : _query(1, 1, n, l, r); }
+    void build(vector<T> &arr) { _build(1, 1, n, arr); }
+    void update(int l, int r, int u) { _update(1, 1, n, l, r, u); }
+};
