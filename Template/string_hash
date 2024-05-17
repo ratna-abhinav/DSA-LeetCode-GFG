@@ -1,0 +1,58 @@
+struct Hash
+{
+    int sz, MOD, BASE;
+    vector<int> fwdHash, revHash, pp;
+    void init(string &s, int base, int mod)
+    {
+        BASE = base; MOD = mod; sz = s.size();
+        fwdHash.assign(sz,0); revHash.assign(sz,0); pp.assign(sz,0);
+        fwdHash[0] = s[0]+1; pp[0] = 1; revHash[sz-1] = s[sz-1] + 1;
+        for (int i=1; i<sz; i++)
+        {
+            fwdHash[i] = (1ll * fwdHash[i-1] * BASE + s[i] + 1) % MOD;
+            pp[i] = (1ll * pp[i-1] * BASE) % MOD;
+            revHash[sz-1-i] = (1ll * revHash[sz-i] * BASE + s[sz-1-i] + 1) % MOD;
+        }
+    }
+    int forwardHash(int l, int r)
+    {
+        if (l>r) return 0;
+        if (l==0) return fwdHash[r];
+        int ans = (0ll + (0ll + fwdHash[r] - 1ll * fwdHash[l-1] * pp[r-l+1]) % MOD + MOD) % MOD;
+        return ans;
+    }
+    int reverseHash(int l, int r)
+    {
+        if (l>r) return 0;
+        if (r==sz-1) return revHash[l];
+        int ans = (0ll + (0ll + revHash[l] - 1ll * revHash[r+1] * pp[r-l+1]) % MOD + MOD) % MOD;
+        return ans;
+    }
+};
+
+int quickHash(string &s, int BASE, int MOD)
+{
+    int ans = s[0]+1, sz = s.size();
+    for (int i=1; i<sz; i++) ans = (1ll * ans * BASE + s[i] + 1) % MOD;
+    return ans;
+}
+
+struct doubleHash
+{
+    Hash h1, h2;
+    void init(string &s, int base1, int base2, int mod1, int mod2)
+    {
+        h1.init(s, base1, mod1);
+        h2.init(s, base2, mod2);
+    }
+    pair<int,int> forwardHash(int l, int r)
+    {
+        pair<int,int> ans = {h1.forwardHash(l, r), h2.forwardHash(l, r)};
+        return ans;
+    }
+    pair<int,int> reverseHash(int l, int r)
+    {
+        pair<int,int> ans = {h1.reverseHash(l, r), h2.reverseHash(l, r)};
+        return ans;
+    }
+};
