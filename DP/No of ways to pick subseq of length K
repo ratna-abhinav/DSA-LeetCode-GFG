@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+using ll = long long;
+
+/*
+  Given an array arr[] of N elements and a positive integer K such that K ≤ N. Find the no of subsequences
+  till length <= K i.e. subsequences of length 0, 1, 2, …, K – 1, K that have all distinct elements.
+
+  Input: arr[] = {2, 2, 3, 3, 5}, K = 2 
+  Output: 14 
+  All the valid subsequences are {}, {2}, {2}, {3}, {3}, {5}, 
+  {2, 3}, {2, 3}, {2, 3}, {2, 3}, {2, 5}, {2, 5}, {3, 5} and {3, 5}.
+
+  Input: arr[] = {1, 2, 3, 4, 4}, K = 4 
+  Output: 24 
+
+  Source: https://www.geeksforgeeks.org/number-of-subsequences-of-maximum-length-k-containing-no-repeated-elements/
+
+*/
+
+int k, n;
+vector<int> arr;
+
+int rec(int i, int left)
+{
+  if (i==n) return 1;
+
+  int ans = rec(i+1, left);
+  if (left>0) ans = (ans + rec(i+1, left-1)*arr[i]);
+  return ans;
+}
+
+void solve()
+{
+  cin >> n >> k;
+  map<int,int> f;
+  for (int i=0; i<n; i++)
+  {
+    int x; cin >> x;
+    f[x]++;
+  }
+  for (auto &it:f) arr.push_back(it.second);
+  n = arr.size();
+  int ans = rec(0,k);
+  cout << ans << '\n';
+}
+
+int main()
+{
+  solve();
+}
