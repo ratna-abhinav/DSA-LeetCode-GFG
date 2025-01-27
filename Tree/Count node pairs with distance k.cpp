@@ -3,10 +3,29 @@ using namespace std;
 
 /*
 
-  Given a tree of N nodes. Count no of distinct pair of nodes such that distance
+  Given a tree of N (N <= 1e5) nodes. Count no of distinct pair of nodes such that distance
   between them is exactly equal to k
 
-  N <= 1e5
+  I/P:
+
+  16 3
+  1 2
+  1 3
+  1 4
+  2 5
+  2 6
+  3 9
+  4 10
+  4 11
+  6 7
+  6 8
+  10 12
+  11 13
+  13 14
+  13 15
+  14 16
+
+  O/P: 22
 
 */
 
