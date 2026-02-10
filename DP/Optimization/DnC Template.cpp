@@ -6,8 +6,9 @@ double cost[100][100], dp[100][100];
 const double INF = 1e12;
 
 /*
-    You need to transmit message from port zero to zero to port n. You can only transmit the message from i-th port to i plus one-th port, 
-    and the transmission can fail with p_i probability. Then you need to again retransmit the message from the previous port which has a memory. Port zero and port n already have memory. Find the minimum number of expected transmissions required to send the message from port zero to port n if we are allowed to select k additional ports to have memory.
+    You need to transmit message from port 0 to port N. You can only transmit the message from i-th port to (i+1)th port, 
+    and the transmission can fail with p[i] probability. Then you need to again retransmit the message from the previous port which has a memory. Port 0 and port N already have memory. 
+    Find the minimum number of expected transmissions required to send the message from port zero to port n if we are allowed to select k additional ports to have memory.
 
     Solution:
 
@@ -71,7 +72,7 @@ int main()
     for (int s = 1; s <= K; ++s)
     {
         dp[s][0] = 0.0;
-        compute_dc(s, 1, N, 0, N - 1);
+        compute_dc(s, 0, N, 0, N - 1);
     }
     double ans = dp[K][N];
     cout << ans;
