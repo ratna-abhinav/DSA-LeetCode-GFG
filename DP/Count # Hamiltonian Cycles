@@ -20,6 +20,7 @@ int hasEdge[22][22];
 
 
 // rec(i, mask): no of hamiltonian cycle starting and ending at node x
+// we can actually remove x from the recursive state
 int rec(int i, int mask, int x)
 {
 	if (mask == (1<<n)-1) return hasEdge[x][i] == 1;
@@ -45,7 +46,7 @@ void solve()
 		hasEdge[u][v] = hasEdge[v][u] = 1;
 	}  
 
-  // no of Hamiltonian cycles starting and ending at node 0
+  // total number of Hamiltonian cycles in the entire graph
 	cout << rec(0,1,0);
 }
 
