@@ -52,13 +52,13 @@ void dfs(int cur, int par)
 
     /*
         f0[i][j] = 
-            max profit after processing first i children
+            max profit if we have considered first i children only
             and selecting exactly j nodes
     */
 
     vector<vector<ll>> f0(m + 1, vector<ll>(K + 1, NEG));
 
-    f0[0][0] = 0;
+    f0[0][0] = 0;   // if we have not selected any child, profit = 0
 
     for (int i=0; i<m; i++)
     {
@@ -90,7 +90,7 @@ void dfs(int cur, int par)
 
     /*
         f1[i][j] =
-                max profit after processing first i children
+                max profit if we have considered first i children only
                 and selecting exactly j nodes from children
                 while cur itself is already selected
     */
