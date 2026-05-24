@@ -63,17 +63,11 @@ void dfs(int cur, int par)
     for (int i=0; i<m; i++)
     {
         int v = ch[i];
-
         for (int used=0; used<=K; used++)
         {
-            if (f0[i][used] == NEG) continue;
-
             for (int take=0; take<=subtree_sz[v] && used+take<=K; take++)
             {
                 ll best_child = max(dp[v][take][0], dp[v][take][1]);
-
-                if (best_child == NEG) continue;
-
                 f0[i+1][used+take] = max(f0[i+1][used+take], f0[i][used] + best_child);
             }
         }
@@ -101,15 +95,10 @@ void dfs(int cur, int par)
     for (int i=0; i<m; i++)
     {
         int v = ch[i];
-
         for (int used=0; used<=K; used++)
         {
-            if (f1[i][used]==NEG) continue;
-
             for (int take=0; take<=subtree_sz[v] && used+take<=K; take++)
             {
-                if (dp[v][take][0] == NEG) continue;
-
                 f1[i+1][used+take] = max(f1[i+1][used+take], f1[i][used] + dp[v][take][0]);
             }
         }
