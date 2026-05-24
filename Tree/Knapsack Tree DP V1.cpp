@@ -26,6 +26,8 @@ vector<vector<array<ll, 2>>> dp;
 void dfs(int cur, int par)
 {
     vector<int> ch;
+
+    // we intialize these values by treating them as leaf node
     subtree_sz[cur] = 1;
 
     for (int nxt : tree[cur])
@@ -38,6 +40,7 @@ void dfs(int cur, int par)
         ch.push_back(nxt);
     }
 
+    // we intialize these values by treating them as leaf node
     for (int k=0; k<=K; k++)
     {
         dp[cur][k][0] = NEG;
@@ -57,7 +60,6 @@ void dfs(int cur, int par)
     */
 
     vector<vector<ll>> f0(m + 1, vector<ll>(K + 1, NEG));
-
     f0[0][0] = 0;   // if we have not selected any child, profit = 0
 
     for (int i=0; i<m; i++)
@@ -95,7 +97,6 @@ void dfs(int cur, int par)
     */
 
     vector<vector<ll>> f1(m+1, vector<ll>(K+1, NEG));
-
     f1[0][1] = profit[cur];
 
     for (int i=0; i<m; i++)
