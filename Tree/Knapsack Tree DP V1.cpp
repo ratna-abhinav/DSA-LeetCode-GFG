@@ -53,7 +53,7 @@ void dfs(int cur, int par)
     /*
         f0[i][j] = 
             max profit if we have considered first i children only
-            and selecting exactly j nodes
+            and selecting exactly j nodes from subtree of cur without selecting cur itself
     */
 
     vector<vector<ll>> f0(m + 1, vector<ll>(K + 1, NEG));
@@ -91,13 +91,12 @@ void dfs(int cur, int par)
     /*
         f1[i][j] =
                 max profit if we have considered first i children only
-                and selecting exactly j nodes from children
-                while cur itself is already selected
+                and selecting exactly j nodes from subtree of cur including cur itself
     */
 
     vector<vector<ll>> f1(m+1, vector<ll>(K+1, NEG));
 
-    f1[0][0] = profit[cur];
+    f1[0][1] = profit[cur];
 
     for (int i=0; i<m; i++)
     {
@@ -116,14 +115,9 @@ void dfs(int cur, int par)
         }
     }
 
-    /*
-        cur itself is selected,
-        so total selected nodes = nodes from children + 1
-    */
-
-    for (int child_taken=0; child_taken+1<=K; child_taken++)
+    for (int child_taken=0; child_taken<=K; child_taken++)
     {
-        dp[cur][child_taken+1][1] = f1[m][child_taken];
+        dp[cur][child_taken][1] = f1[m][child_taken];
     }
 }
 
@@ -144,6 +138,12 @@ int main()
         cin >> u >> v;
         tree[u].push_back(v);
         tree[v].push_back(u);
+    }
+
+    if (K==0)
+    {
+        cout << 0 << '\n';
+        return 0;
     }
 
     dfs(1, 0);
