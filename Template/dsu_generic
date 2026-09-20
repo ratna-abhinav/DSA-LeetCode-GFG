@@ -1,0 +1,48 @@
+#include <ext/pb_ds/assoc_container.hpp>
+using namespace __gnu_pbds;
+using ll = long long;
+
+struct DSU 
+{
+    gp_hash_table<ll,ll> parent;
+    gp_hash_table<ll,ll> sz;
+
+    void make_set(ll x) 
+    {
+        parent[x] = x;
+        sz[x] = 1;
+    }
+
+    ll find_leader(ll x) 
+    {
+        auto it = parent.find(x);
+        if (it == parent.end()) 
+        {
+            parent[x] = x;
+            sz[x] = 1;
+            return x;
+        }
+        ll root = x;
+        while (parent[root] != root) root = parent[root];
+        while (x != root) 
+        {
+            ll p = parent[x];
+            parent[x] = root;
+            x = p;
+        }
+        return root;
+    }
+
+    void merge(ll a, ll b) 
+    {
+        a = find_leader(a);
+        b = find_leader(b);
+        if (a == b) return;
+        if (sz[a] < sz[b]) swap(a, b);
+        parent[b] = a;
+        sz[a] += sz[b];
+    }
+
+    bool same(ll a, ll b) { return find_leader(a) == find_leader(b); }
+    ll get_size(ll a) { return sz[find_leader(a)]; }
+};

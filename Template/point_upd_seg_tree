@@ -1,0 +1,56 @@
+#define lc (x << 1)
+#define rc (x << 1) | 1
+vector<int> ST;
+const int inf = 1e9;
+
+/*
+
+    if 0-based indexing then lc = 2*x+1, rc = 2*x+2
+    build(0,0,n-1,arr)
+    
+    for 1-based indexing:
+    = build(1,1,n,arr)
+    = if you want to include 0th index as well, then build(1,0,n,arr)
+*/
+
+int combine(int lcVal, int rcVal)
+{
+    int ans = max(lcVal, rcVal);
+    return ans;
+}
+
+void build(int x, int l, int r, vector<int> &arr)
+{
+    if (l==r)
+    {
+        ST[x] = arr[l];
+        return;
+    }
+    int mid = (l+r)/2;
+    build(lc, l, mid, arr); build(rc, mid+1, r, arr);
+    ST[x] = combine(ST[lc], ST[rc]);
+}
+
+int query(int L, int R, int x, int l, int r)
+{
+    if (l>R || r<L) return -inf;
+    if (l>=L && r<=R) return ST[x];
+    int mid = (l + r) / 2;
+    int ans = combine(query(L, R, lc, l, mid), query(L, R, rc, mid+1, r));
+    return ans;
+}
+
+void update(int pos, int val, int x, int l, int r)
+{
+    if (pos<l || pos>r) return;
+    if (l==r)
+    {
+        ST[x] = val;
+        return;
+    }
+    int mid = (l + r) / 2;
+    update(pos, val, lc, l, mid); update(pos, val, rc, mid+1, r);
+
+    // pass the update information to ancestors
+    ST[x] = combine(ST[lc], ST[rc]);
+}
